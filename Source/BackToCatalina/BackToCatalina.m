@@ -47,10 +47,8 @@ WEAK_IMPORT_ATTRIBUTE
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerSupportsSelectionRolloverDefaultValueFunction"),
               SelectionRolloverNew,
               &SelectionRolloverOld);
-
-    if (!isTahoeOrLater) {
-        ZKSwizzle(themeHook, NSThemeFrame);
-    }
+    
+    ZKSwizzle(themeHook, NSThemeFrame);
     ZKSwizzle(tbHook, NSTrackingSeparatorToolbarItem);
     ZKSwizzle(fontHook, NSFont);
     ZKSwizzle(notificationHook, _NSConcreteUserNotification);
@@ -67,14 +65,20 @@ WEAK_IMPORT_ATTRIBUTE
 }
 
 +(double)_windowTitlebarTitleMinHeight:(unsigned long long)a0 {
+    if (isTahoeOrLater) return ZKOrig(double);
+    
     return MIN(ZKOrig(double, a0), 21.0);
 }
 
 -(double)_minYTitlebarButtonsOffset {
+    if (isTahoeOrLater) return ZKOrig(double);
+    
     return [self _titlebarHeight] - 22.0;
 }
 
 -(double)_toolbarOffsetIfTitleIsHidden {
+    if (isTahoeOrLater) return ZKOrig(double);
+    
     if([[self window] titleVisibility] == NSWindowTitleVisible)
         return -4.0;
     else
@@ -82,6 +86,8 @@ WEAK_IMPORT_ATTRIBUTE
 }
 
 -(double)_distanceFromToolbarBaseToTitlebar {
+    if (isTahoeOrLater) return ZKOrig(double);
+    
     if ([[[self window] toolbar] isVisible] ){
         if([[self window] titleVisibility] == NSWindowTitleVisible)
             return ZKOrig(double) + 5.0;
