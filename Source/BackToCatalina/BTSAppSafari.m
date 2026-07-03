@@ -30,7 +30,7 @@ hook(UnifiedField)
     return 4;
 }
 - (CGFloat)_urlTextHeight {
-    return 23;
+    return isTahoeOrLater ? 26 : 23;
 }
 - (CGFloat)_urlFieldHeight {
     return 23;
