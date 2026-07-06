@@ -64,21 +64,24 @@ WEAK_IMPORT_ATTRIBUTE
     return ZKOrig(double);
 }
 
+// For macOS 15 and earlier...
 +(double)_windowTitlebarTitleMinHeight:(unsigned long long)a0 {
     if (isTahoeOrLater) return ZKOrig(double);
     
     return MIN(ZKOrig(double, a0), 21.0);
 }
 
+// Tahoe function version - adds new parameter to account for...
++(double)_windowTitlebarTitleMinHeight:(unsigned long long)_windowTitlebarTitleMinHeight hasSolariumAppearance:(BOOL)hasSolariumAppearance {
+    return (ZKOrig(double, _windowTitlebarTitleMinHeight, hasSolariumAppearance), 21.0);
+}
+
+
 -(double)_minYTitlebarButtonsOffset {
-    if (isTahoeOrLater) return ZKOrig(double);
-    
     return [self _titlebarHeight] - 22.0;
 }
 
 -(double)_toolbarOffsetIfTitleIsHidden {
-    if (isTahoeOrLater) return ZKOrig(double);
-    
     if([[self window] titleVisibility] == NSWindowTitleVisible)
         return -4.0;
     else
@@ -86,8 +89,6 @@ WEAK_IMPORT_ATTRIBUTE
 }
 
 -(double)_distanceFromToolbarBaseToTitlebar {
-    if (isTahoeOrLater) return ZKOrig(double);
-    
     if ([[[self window] toolbar] isVisible] ){
         if([[self window] titleVisibility] == NSWindowTitleVisible)
             return ZKOrig(double) + 5.0;
