@@ -42,6 +42,16 @@ hook(NSWindow)
     }
     _orig(void, value);
 }
+
+// Tahoe seems to read from this value exclusively for the corner radius. Why, I'm not sure...
+- (double)_bottomCornerRadius {
+#ifdef APPLY_BUNDLE
+    return 4;
+#else
+    return 9; // We check if the theme bundle is being applied - use standard Sequoia radius if not
+#endif
+}
+
 endhook
 
 hook(NSSheetMoveHelper)

@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Alexander S Zielenski. All rights reserved.
 //
 
+#import "CommonDef.h"
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 #import <sys/cdefs.h>

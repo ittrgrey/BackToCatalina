@@ -2,6 +2,7 @@
 #import "dobby.h"
 #import "ZKSwizzle.h"
 
+// Entire section is dedicated to reverting Big Sur-style alert dialogs...
 Boolean (*AlertGlassSolariumEnabledOld)();
 Boolean AlertGlassSolariumEnabledNew() {
     return false;

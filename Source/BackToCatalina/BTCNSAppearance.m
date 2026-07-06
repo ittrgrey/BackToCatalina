@@ -173,6 +173,7 @@ hook(NSString)
 }
 endhook
 
+#ifdef APPLY_BUNDLE
 hook(NSAppearance)
 
 + (NSCompositeAppearance *)_aquaAppearanceWithAccessibility:(BOOL)accessibility {
@@ -325,6 +326,7 @@ hook(NSAppearance)
     return BTCCompositeCacheStore(cache, key, composite);
 }
 endhook
+#endif
 
 hook(NSCompositeAppearance)
 - (BOOL)_usesMetricsAppearance {
