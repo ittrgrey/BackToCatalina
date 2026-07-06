@@ -6,6 +6,9 @@
 //  Copyright (c) 2014 Alexander S Zielenski. All rights reserved.
 //
 
+// BackToCatalina: Uncomment this to temporarily disable loading any changes for debugging purposes...
+//#define DisableForDebug
+
 #import "ZKSwizzle.h"
 static NSMutableDictionary *classTable;
 
@@ -153,6 +156,9 @@ ZKIMP ZKSuperImplementation(id object, SEL sel, const char *info) {
 
 static BOOL enumerateMethods(Class, Class);
 BOOL _ZKSwizzle(Class src, Class dest) {
+#ifdef DisableForDebug
+    return NO;
+#endif
     if (dest == NULL)
         return NO;
     
