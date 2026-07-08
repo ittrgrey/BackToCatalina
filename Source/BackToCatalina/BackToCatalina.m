@@ -25,7 +25,6 @@ NSOperatingSystemVersion tahoeVersion = {
 
 WEAK_IMPORT_ATTRIBUTE
 @interface load : NSObject @end
-@interface notificationHook : NSUserNotification @end
 @interface notificationHook2 : UNNotificationSound @end
 
 @implementation load
@@ -42,17 +41,7 @@ WEAK_IMPORT_ATTRIBUTE
               SelectionRolloverNew,
               &SelectionRolloverOld);
     
-    ZKSwizzle(notificationHook, _NSConcreteUserNotification);
     ZKSwizzle(notificationHook2, UNNotificationSound);
-}
-
-@end
-
-@implementation notificationHook
-- (void)setSoundName:(NSString *)soundName {
-    if ([soundName isEqual:NSUserNotificationDefaultSoundName])
-        return ZKOrig(void, @"Tri-tone");
-    return ZKOrig(void, soundName);
 }
 
 @end
