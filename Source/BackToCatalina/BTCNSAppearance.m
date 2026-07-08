@@ -164,6 +164,7 @@ static NSDarkAquaAppearance *NSCachedDarkAquaAccessibilityGraphiteCatalinaAppear
     return BTC_CACHED_BUILTIN(@"NSDarkAquaAppearance", @"Catalina/AccessibilityGraphiteDarkAquaAppearance", @"NSAppearanceNameAccessibilityGraphiteDarkAqua", @"NSAppearanceNameAccessibilityGraphiteDarkAqua");
 }
 
+#ifdef APPLY_BUNDLE
 hook(NSString)
 - (NSString *)stringByAppendingPathComponent:(NSString *)str {
     if (str.length == 23 && ((NSString *)self).length == 28 && [str isEqualTo:@"SystemAppearance.bundle"] && [self isEqualTo:@"/System/Library/CoreServices"]) {
@@ -173,7 +174,6 @@ hook(NSString)
 }
 endhook
 
-#ifdef APPLY_BUNDLE
 hook(NSAppearance)
 
 + (NSCompositeAppearance *)_aquaAppearanceWithAccessibility:(BOOL)accessibility {
