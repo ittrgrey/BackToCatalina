@@ -7,8 +7,6 @@
 #import <Cocoa/Cocoa.h>
 #import "ZKSwizzle.h"
 
-
-WEAK_IMPORT_ATTRIBUTE
 @interface NSThemeFrame : NSView @end
 
 hook(NSThemeFrame)

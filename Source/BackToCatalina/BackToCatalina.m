@@ -25,7 +25,6 @@ NSOperatingSystemVersion tahoeVersion = {
 
 WEAK_IMPORT_ATTRIBUTE
 @interface load : NSObject @end
-@interface tbHook: NSTrackingSeparatorToolbarItem @end
 @interface splitViewHook : NSSplitViewItem @end
 @interface fontHook : NSFont @end
 @interface notificationHook : NSUserNotification @end
@@ -45,23 +44,10 @@ WEAK_IMPORT_ATTRIBUTE
               SelectionRolloverNew,
               &SelectionRolloverOld);
     
-    ZKSwizzle(tbHook, NSTrackingSeparatorToolbarItem);
     ZKSwizzle(fontHook, NSFont);
     ZKSwizzle(notificationHook, _NSConcreteUserNotification);
     ZKSwizzle(notificationHook2, UNNotificationSound);
     ZKSwizzle(splitViewHook, NSSplitViewItem);
-}
-
-@end
-
-@implementation tbHook
-
-+(instancetype)trackingSeparatorToolbarItemWithIdentifier:(NSToolbarItemIdentifier)identifier splitView:(NSSplitView *)splitView dividerIndex:(NSInteger)dividerIndex {
-    return ZKOrig(tbHook*, identifier, nil, dividerIndex);
-}
-
--(BOOL)isHidden {
-    return true;
 }
 
 @end
