@@ -328,9 +328,18 @@ hook(NSAppearance)
 endhook
 #endif
 
+// A back-stop: Even if solarium is somehow switched on system-wide, we will disable it for all applications on our end...
+static BOOL IsSolariumEnabled() {
+    return FALSE;
+}
+
 hook(NSCompositeAppearance)
 - (BOOL)_usesMetricsAppearance {
     return NO;
+}
+
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
 }
 endhook
 
@@ -345,6 +354,10 @@ hook(NSVibrantDarkAppearance)
     return NO;
 }
 
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
+
 endhook
 
 hook(NSVibrantLightAppearance)
@@ -357,16 +370,27 @@ hook(NSVibrantLightAppearance)
     return NO;
 }
 
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
 endhook
 
 hook(NSAquaAppearance)
 - (BOOL)_usesMetricsAppearance {
     return NO;
 }
+
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
 endhook
 
 hook(NSDarkAquaAppearance)
 - (BOOL)_usesMetricsAppearance {
     return NO;
+}
+
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
 }
 endhook
