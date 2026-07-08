@@ -25,8 +25,6 @@ NSOperatingSystemVersion tahoeVersion = {
 
 WEAK_IMPORT_ATTRIBUTE
 @interface load : NSObject @end
-@interface splitViewHook : NSSplitViewItem @end
-@interface fontHook : NSFont @end
 @interface notificationHook : NSUserNotification @end
 @interface notificationHook2 : UNNotificationSound @end
 
@@ -44,21 +42,10 @@ WEAK_IMPORT_ATTRIBUTE
               SelectionRolloverNew,
               &SelectionRolloverOld);
     
-    ZKSwizzle(fontHook, NSFont);
     ZKSwizzle(notificationHook, _NSConcreteUserNotification);
     ZKSwizzle(notificationHook2, UNNotificationSound);
 }
 
-@end
-
-@implementation fontHook
-+ (NSFont *)_windowTitleFontWithSubtitle:(BOOL)subtitle toolbarStyle:(NSWindowToolbarStyle)toolbarStyle {
-    return [NSFont systemFontOfSize:0];
-}
-
-+(NSFont*)titleBarFontOfSize:(CGFloat)fontSize {
-    return [NSFont systemFontOfSize:fontSize];
-}
 @end
 
 @implementation notificationHook
