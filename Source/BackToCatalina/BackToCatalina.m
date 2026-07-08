@@ -47,15 +47,6 @@ WEAK_IMPORT_ATTRIBUTE
     ZKSwizzle(fontHook, NSFont);
     ZKSwizzle(notificationHook, _NSConcreteUserNotification);
     ZKSwizzle(notificationHook2, UNNotificationSound);
-    ZKSwizzle(splitViewHook, NSSplitViewItem);
-}
-
-@end
-
-@implementation splitViewHook
-
--(BOOL)allowsFullHeightLayout {
-    return false;
 }
 
 @end
