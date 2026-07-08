@@ -1,17 +1,13 @@
 #import "BackToCatalina.h"
 #import "ZKSwizzle.h"
 
-@interface UnifiedField : NSTextField
-@end
+@interface UnifiedField : NSTextField @end
 
-@interface CombinedSidebarTabGroupToolbarButton : NSView
-@end
+@interface CombinedSidebarTabGroupToolbarButton : NSView @end
 
-@interface UnifiedFieldBezelView : NSTextField
-@end
+@interface UnifiedFieldBezelView : NSTextField @end
 
-@interface UnifiedFieldButtonMetrics : NSObject
-@end
+@interface UnifiedFieldButtonMetrics : NSObject @end
 
 hook(BadgeButton)
 - (BOOL)allowsVibrancy {
@@ -121,17 +117,23 @@ endhook
 
 static NSImage *_backgroundPrivateWindowCapLeft(void)
 {
-    return [carBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldCapLeft"];
+    if (carBundle) return [carBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldCapLeft"];
+    
+    return [NSBundle.mainBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldCapLeft"];
 }
 
 static NSImage *_backgroundPrivateWindowCapRight(void)
 {
-    return [carBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldCapRight"];
+    if (carBundle) return [carBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldCapRight"];
+    
+    return [NSBundle.mainBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldCapRight"];
 }
 
 static NSImage *_backgroundPrivateWindowFill(void)
 {
-    return [carBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldStretch"];
+    if (carBundle) return [carBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldStretch"];
+    
+    return [NSBundle.mainBundle imageForResource:@"com.apple.Safari.PrivateWindowUnifiedFieldStretch"];
 }
 
 hook(UnifiedFieldBezelView)

@@ -260,7 +260,7 @@ hook(NSImage)
             if (isFinder) {
                 image = [[NSImage alloc] initWithContentsOfFile:assetName];
                 image.template = YES;
-            } else if (isMusic) {
+            } else if (isMusic && carBundle) {
                 image = [carBundle imageForResource:assetName];
             } else {
                 image = [NSBundle.mainBundle imageForResource:assetName];
