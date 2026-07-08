@@ -24,15 +24,12 @@ NSOperatingSystemVersion tahoeVersion = {
 };
 
 WEAK_IMPORT_ATTRIBUTE
-@interface NSThemeFrame : NSView @end
-
 @interface load : NSObject @end
 @interface tbHook: NSTrackingSeparatorToolbarItem @end
 @interface splitViewHook : NSSplitViewItem @end
 @interface fontHook : NSFont @end
 @interface notificationHook : NSUserNotification @end
 @interface notificationHook2 : UNNotificationSound @end
-@interface themeHook : NSThemeFrame @end
 
 @implementation load
 
@@ -48,7 +45,6 @@ WEAK_IMPORT_ATTRIBUTE
               SelectionRolloverNew,
               &SelectionRolloverOld);
     
-    ZKSwizzle(themeHook, NSThemeFrame);
     ZKSwizzle(tbHook, NSTrackingSeparatorToolbarItem);
     ZKSwizzle(fontHook, NSFont);
     ZKSwizzle(notificationHook, _NSConcreteUserNotification);
@@ -57,59 +53,6 @@ WEAK_IMPORT_ATTRIBUTE
 }
 
 @end
-
-@implementation themeHook
-
--(double)_titlebarHeight {
-    return ZKOrig(double);
-}
-
-// For macOS 15 and earlier...
-+(double)_windowTitlebarTitleMinHeight:(unsigned long long)a0 {
-    if (isTahoeOrLater) return ZKOrig(double);
-    
-    return MIN(ZKOrig(double, a0), 21.0);
-}
-
-// Tahoe function version - adds new parameter to account for...
-+(double)_windowTitlebarTitleMinHeight:(unsigned long long)_windowTitlebarTitleMinHeight hasSolariumAppearance:(BOOL)hasSolariumAppearance {
-    return (ZKOrig(double, _windowTitlebarTitleMinHeight, hasSolariumAppearance), 21.0);
-}
-
-
--(double)_minYTitlebarButtonsOffset {
-    return [self _titlebarHeight] - 22.0;
-}
-
--(double)_toolbarOffsetIfTitleIsHidden {
-    if([[self window] titleVisibility] == NSWindowTitleVisible)
-        return -4.0;
-    else
-        return ZKOrig(double);
-}
-
--(double)_distanceFromToolbarBaseToTitlebar {
-    if ([[[self window] toolbar] isVisible] ){
-        if([[self window] titleVisibility] == NSWindowTitleVisible)
-            return ZKOrig(double) + 5.0;
-        else
-            return ZKOrig(double) - 1.0;
-    }
-    else {
-        return ZKOrig(double);
-    }
-}
-
--(double)_toolbarLeadingSpace {
-    return ZKOrig(double) + 2.0;
-}
-
--(double)_toolbarTrailingSpace {
-    return ZKOrig(double) + 2.0;
-}
-
-@end
-
 
 @implementation tbHook
 
