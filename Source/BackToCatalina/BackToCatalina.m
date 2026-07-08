@@ -2,7 +2,6 @@
 
 #import "dobby.h"
 #import "ZKSwizzle.h"
-#import <UserNotifications/UserNotifications.h>
 
 NSBundle* carBundle;
 BOOL isTahoeOrLater;
@@ -25,7 +24,6 @@ NSOperatingSystemVersion tahoeVersion = {
 
 WEAK_IMPORT_ATTRIBUTE
 @interface load : NSObject @end
-@interface notificationHook2 : UNNotificationSound @end
 
 @implementation load
 
@@ -40,17 +38,6 @@ WEAK_IMPORT_ATTRIBUTE
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerSupportsSelectionRolloverDefaultValueFunction"),
               SelectionRolloverNew,
               &SelectionRolloverOld);
-    
-    ZKSwizzle(notificationHook2, UNNotificationSound);
-}
-
-@end
-
-@implementation notificationHook2
-+ (id)_soundWithAlertType:(long long)a0 audioVolume:(id)a1 critical:(BOOL)a2 toneFileName:(id)a3 {
-    if(a3 == nil)
-        return ZKOrig(id, a0, a1, a2, @"Tri-Tone");
-    return ZKOrig(id, a0, a1, a2, a3);
 }
 
 @end
