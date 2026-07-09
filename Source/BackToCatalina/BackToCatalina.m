@@ -42,3 +42,19 @@ WEAK_IMPORT_ATTRIBUTE
 
 @end
 
+// Stop-gap: Replace glass with reduced motion appearance
+// TODO: Investigate notificationcenter further
+hook(NSWorkspace)
+
+BOOL isNotificationCenter(void) {
+    NSString* bundleId = [[NSBundle mainBundle] bundleIdentifier];
+    
+    return [bundleId isEqualToString:@"com.apple.notificationcenterui"];
+}
+
+- (BOOL)accessibilityDisplayShouldReduceMotion {
+    return isNotificationCenter() ? true : ZKOrig(BOOL);
+}
+
+endhook
+
