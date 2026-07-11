@@ -27,11 +27,16 @@ hook(NSTextField)
     return ZKOrig(BOOL);
 }
 
+// If we don't check for if the frame is hosted within a toolbar, the changes cause a visual offset bug
+- (id)hostingToolbarItem {
+    return ZKOrig(id);
+}
+
 // Fix searchbox height in System Settings
 - (void)setFrameSize:(CGSize)frameSize {
     // HACKY!!
     // Actual core of the problem relates to the way the image is incompatible with the 9-silce format that newer SystemAppearance *is* compatible with. Pre-BigSur, all input fields therefore had to be the same height. Catalina and earlier therefore need this issue mitigated.
-    frameSize.height = ([self isBezeled] && [self _wantsSeparatedSubviews]) ? MIN(frameSize.height, 22.0) : frameSize.height;
+    frameSize.height = ([self isBezeled] && [self _wantsSeparatedSubviews] && ![self hostingToolbarItem]) ? MIN(frameSize.height, 22.0) : frameSize.height;
     
     return ZKOrig(void, frameSize);
 }
