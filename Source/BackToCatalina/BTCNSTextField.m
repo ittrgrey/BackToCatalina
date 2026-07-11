@@ -32,6 +32,10 @@ hook(NSTextField)
     return ZKOrig(id);
 }
 
+- (BOOL)supportsFauxSolariumControlMetrics {
+    return NO;
+}
+
 // Fix searchbox height in System Settings
 - (void)setFrameSize:(CGSize)frameSize {
     // HACKY!!
@@ -47,6 +51,15 @@ hook(NSTextField)
     if (controlSize == NSControlSizeLarge) controlSize = NSControlSizeRegular;
     
     return ZKOrig(void, controlSize);
+}
+
+endhook
+
+hook(NSTextFieldAppearanceBasedVisualProvider)
+
+// Revert to 10.15 behaviour
++ (BOOL)wantsSeparatedSubviewsWithBezelConfiguration:(id)bezelConfiguration {
+    return NO;
 }
 
 endhook
