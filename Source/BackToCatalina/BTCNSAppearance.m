@@ -1,5 +1,6 @@
 #import "BTCNSMutableArray.h"
 #import "ZKSwizzle.h"
+#import <Cocoa/Cocoa.h>
 #import <AppKit/NSAccessibility.h>
 #import <AppKit/NSAppearance.h>
 #import <os/lock.h>
@@ -329,7 +330,7 @@ endhook
 #endif
 
 // A back-stop: Even if solarium is somehow switched on system-wide, we will disable it for all applications on our end...
-static BOOL IsSolariumEnabled() {
+BOOL IsSolariumEnabled(void) {
     return FALSE;
 }
 
