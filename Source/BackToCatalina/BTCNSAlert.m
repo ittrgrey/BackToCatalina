@@ -68,7 +68,10 @@ endhook
 
 hook(NSButton)
 - (void)setControlSize:(NSControlSize)controlSize {
-    _orig(void, shouldForceRegularControlSize ? NSControlSizeRegular : controlSize);
+    // NSControlSizeLarge did not exist prior to macOS 11
+    if (controlSize == NSControlSizeLarge) controlSize = NSControlSizeRegular;
+    
+    return _orig(void, shouldForceRegularControlSize ? NSControlSizeRegular : controlSize);
 }
 endhook
 
