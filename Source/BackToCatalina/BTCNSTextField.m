@@ -36,5 +36,12 @@ hook(NSTextField)
     return ZKOrig(void, frameSize);
 }
 
+// Fix overall textbox height so that it cannot be absurdly large
+- (void)setControlSize:(NSControlSize)controlSize {
+    // NSControlSizeLarge did not exist prior to macOS 11
+    if (controlSize == NSControlSizeLarge) controlSize = NSControlSizeRegular;
+    
+    return ZKOrig(void, controlSize);
+}
 
 endhook
