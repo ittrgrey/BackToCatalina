@@ -27,7 +27,7 @@ hook(NSThemeFrame)
 
 // Tahoe function version - adds new parameter to account for...
 +(double)_windowTitlebarTitleMinHeight:(unsigned long long)_windowTitlebarTitleMinHeight hasSolariumAppearance:(BOOL)hasSolariumAppearance {
-    return (ZKOrig(double, _windowTitlebarTitleMinHeight, hasSolariumAppearance), 21.0);
+    return MIN(ZKOrig(double, _windowTitlebarTitleMinHeight, hasSolariumAppearance), 21.0);
 }
 
 
