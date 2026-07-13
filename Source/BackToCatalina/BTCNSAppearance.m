@@ -1,3 +1,5 @@
+// NSAppearance loader currently in repository here is in the process of being rewritten/replaced to enable better functionality such as theme-aware elements
+
 #import "BTCNSMutableArray.h"
 #import "ZKSwizzle.h"
 #import <Cocoa/Cocoa.h>
@@ -168,7 +170,9 @@ static NSDarkAquaAppearance *NSCachedDarkAquaAccessibilityGraphiteCatalinaAppear
 #ifdef APPLY_BUNDLE
 hook(NSString)
 - (NSString *)stringByAppendingPathComponent:(NSString *)str {
-    if (str.length == 23 && ((NSString *)self).length == 28 && [str isEqualTo:@"SystemAppearance.bundle"] && [self isEqualTo:@"/System/Library/CoreServices"]) {
+    NSBundle* catalinaVisualStyle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/SystemAppearance.bundle"];
+    
+    if (str.length == 23 && ((NSString *)self).length == 28 && [str isEqualTo:@"SystemAppearance.bundle"] && [self isEqualTo:@"/System/Library/CoreServices"] && catalinaVisualStyle) {
         return @"/private/var/ammonia/core/tweaks/libBackToCatalina/SystemAppearance.bundle";
     }
     return _orig(NSString *, str);
@@ -326,6 +330,16 @@ hook(NSAppearance)
     composite.name = @"NSAppearanceNameDarkAqua";
     return BTCCompositeCacheStore(cache, key, composite);
 }
+
+// Restoring navigation button background in System Settings et al...
++ (NSAppearance*)_fauxVibrantDarkAppearance {
+    return [self _vibrantDarkAppearance];
+}
+
++ (NSAppearance*)_fauxVibrantLightAppearance {
+    return [self _vibrantLightAppearance];
+}
+
 endhook
 #endif
 
