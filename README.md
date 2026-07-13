@@ -17,7 +17,7 @@ To get full-width sidebar selection highlight, open Terminal and run:
 defaults write -g NSSidebarUsesGoldenMetrics -bool false
 ```
 
-If an app has compatility issue with BackToCatalina, add the executable name to the end of `/private/var/ammonia/core/tweaks/libBackToCatalina.dylib.blacklist`
+If an app has compatibility issues with BackToCatalina, add the executable name to the end of `/private/var/ammonia/core/tweaks/libBackToCatalina.dylib.blacklist`
 
 ## Uninstalling BackToCatalina Beta
 In Terminal, run the following and reboot:
