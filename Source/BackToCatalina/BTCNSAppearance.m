@@ -1,11 +1,9 @@
 //
-//  BTCNSAppearanceRewrite.m
+//  BTCNSAppearance.m
 //  BackToCatalina
 //
 //  Created by ittrgrey on 13/07/2026.
 //
-
-#if 1
 
 #import <Cocoa/Cocoa.h>
 
@@ -384,4 +382,3 @@ hook(NSDarkAquaAppearance)
 
 endhook
 
-#endif
