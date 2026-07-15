@@ -60,8 +60,6 @@ NSAppearance* _accessibilityGraphiteDarkAquaAppearance;
 // Load resources...
 __attribute__((constructor)) static void InitVisualStyle(void)
 {
-    carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/SystemAppearance.bundle"];
-    
     // Check for our bundle first because otherwise, well, if it isn't there we can safely not apply anything and carry on as before...
     if (carBundle)
     {
