@@ -1,3 +1,4 @@
+#if 0
 // NSAppearance loader currently in repository here is in the process of being rewritten/replaced to enable better functionality such as theme-aware elements
 
 #import "BTCNSMutableArray.h"
@@ -409,3 +410,4 @@ hook(NSDarkAquaAppearance)
     return IsSolariumEnabled();
 }
 endhook
+#endif
