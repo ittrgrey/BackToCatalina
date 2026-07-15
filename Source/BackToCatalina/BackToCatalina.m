@@ -28,7 +28,9 @@ WEAK_IMPORT_ATTRIBUTE
 @implementation load
 
 +(void)load {
-    carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/SystemAppearance.bundle"];
+    // This loads from a bundle that contains the asset files, but otherwise has been renamed etc so that it isn't wiped during system updates
+    carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/BTC_VisualStyle.bundle"];
+    
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
 
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),

@@ -63,25 +63,25 @@ __attribute__((constructor)) static void InitVisualStyle(void)
     // Check for our bundle first because otherwise, well, if it isn't there we can safely not apply anything and carry on as before...
     if (carBundle)
     {
-        _accessibilitySystemAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilitySystemAppearance" bundle:carBundle];
+        _accessibilitySystemAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilitySystemAppearance" bundle:carBundle];
         
-        _systemAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/SystemAppearance" bundle:carBundle];
-        _graphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/GraphiteAppearance" bundle:carBundle];
-        _accessibilityAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilityAppearance" bundle:carBundle];
-        _accessibilityGraphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilityGraphiteAppearance" bundle:carBundle];
+        _systemAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"SystemAppearance" bundle:carBundle];
+        _graphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"GraphiteAppearance" bundle:carBundle];
+        _accessibilityAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityAppearance" bundle:carBundle];
+        _accessibilityGraphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityGraphiteAppearance" bundle:carBundle];
     
-        _darkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/DarkAppearance" bundle:carBundle];
-        _graphiteDarkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/GraphiteDarkAppearance" bundle:carBundle];
-        _accessibilityDarkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilityDarkAppearance" bundle:carBundle];
-        _accessibilityDarkGraphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilityDarkGraphiteAppearance" bundle:carBundle];
+        _darkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"DarkAppearance" bundle:carBundle];
+        _graphiteDarkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"GraphiteDarkAppearance" bundle:carBundle];
+        _accessibilityDarkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityDarkAppearance" bundle:carBundle];
+        _accessibilityDarkGraphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityDarkGraphiteAppearance" bundle:carBundle];
         
-        _vibrantLightAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/VibrantLightAppearance" bundle:carBundle];
-        _accessibilityVibrantLightAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilityVibrantLightAppearance" bundle:carBundle];
+        _vibrantLightAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"VibrantLightAppearance" bundle:carBundle];
+        _accessibilityVibrantLightAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityVibrantLightAppearance" bundle:carBundle];
         
-        _darkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/DarkAquaAppearance" bundle:carBundle];
-        _graphiteDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/GraphiteDarkAquaAppearance" bundle:carBundle];
-        _accessibilityDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilityDarkAquaAppearance" bundle:carBundle];
-        _accessibilityGraphiteDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"Catalina/AccessibilityGraphiteDarkAquaAppearance" bundle:carBundle];
+        _darkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"DarkAquaAppearance" bundle:carBundle];
+        _graphiteDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"GraphiteDarkAquaAppearance" bundle:carBundle];
+        _accessibilityDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityDarkAquaAppearance" bundle:carBundle];
+        _accessibilityGraphiteDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityGraphiteDarkAquaAppearance" bundle:carBundle];
     
     }
 }
