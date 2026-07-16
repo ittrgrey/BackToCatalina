@@ -2,6 +2,7 @@
 #import "dobby.h"
 #import "ZKSwizzle.h"
 
+// Entire section is dedicated to reverting Big Sur-style alert dialogs...
 Boolean (*AlertGlassSolariumEnabledOld)();
 Boolean AlertGlassSolariumEnabledNew() {
     return false;
@@ -67,7 +68,10 @@ endhook
 
 hook(NSButton)
 - (void)setControlSize:(NSControlSize)controlSize {
-    _orig(void, shouldForceRegularControlSize ? NSControlSizeRegular : controlSize);
+    // NSControlSizeLarge did not exist prior to macOS 11
+    if (controlSize == NSControlSizeLarge) controlSize = NSControlSizeRegular;
+    
+    return _orig(void, shouldForceRegularControlSize ? NSControlSizeRegular : controlSize);
 }
 endhook
 

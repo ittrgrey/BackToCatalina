@@ -12,7 +12,7 @@
         @"NSToolbarItemStandardItemsUseSymbolImages": @NO,
         @"NSToolbarSidebarItemUseSymbolImages": @NO,
         @"NSToolbarCloudSharingItemUseSymbolImages": @NO,
-        @"NSAlertMetricsGatheringEnabled": @NO, // Only effective on macOS 11 and 12
+        @"NSAlertMetricsGatheringEnabled": @NO, // Only effective on macOS 11 and 12 - see BTCNSAlert.m for macOS 13 and later
     }];
 }
 

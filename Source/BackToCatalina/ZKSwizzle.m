@@ -153,6 +153,9 @@ ZKIMP ZKSuperImplementation(id object, SEL sel, const char *info) {
 
 static BOOL enumerateMethods(Class, Class);
 BOOL _ZKSwizzle(Class src, Class dest) {
+#ifdef DEBUG_DISABLE
+    return NO;
+#endif
     if (dest == NULL)
         return NO;
     

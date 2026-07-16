@@ -2,7 +2,6 @@
 
 #import "dobby.h"
 #import "ZKSwizzle.h"
-#import <UserNotifications/UserNotifications.h>
 
 NSBundle* carBundle;
 BOOL isTahoeOrLater;
@@ -24,20 +23,14 @@ NSOperatingSystemVersion tahoeVersion = {
 };
 
 WEAK_IMPORT_ATTRIBUTE
-@interface NSThemeFrame : NSView @end
-
 @interface load : NSObject @end
-@interface tbHook: NSTrackingSeparatorToolbarItem @end
-@interface splitViewHook : NSSplitViewItem @end
-@interface fontHook : NSFont @end
-@interface notificationHook : NSUserNotification @end
-@interface notificationHook2 : UNNotificationSound @end
-@interface themeHook : NSThemeFrame @end
 
 @implementation load
 
 +(void)load {
-    carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/SystemAppearance.bundle"];
+    // This loads from a bundle that contains the asset files, but otherwise has been renamed etc so that it isn't wiped during system updates
+    carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/BTC_VisualStyle.bundle"];
+    
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
 
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
@@ -47,107 +40,23 @@ WEAK_IMPORT_ATTRIBUTE
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerSupportsSelectionRolloverDefaultValueFunction"),
               SelectionRolloverNew,
               &SelectionRolloverOld);
-
-    if (!isTahoeOrLater) {
-        ZKSwizzle(themeHook, NSThemeFrame);
-    }
-    ZKSwizzle(tbHook, NSTrackingSeparatorToolbarItem);
-    ZKSwizzle(fontHook, NSFont);
-    ZKSwizzle(notificationHook, _NSConcreteUserNotification);
-    ZKSwizzle(notificationHook2, UNNotificationSound);
-    ZKSwizzle(splitViewHook, NSSplitViewItem);
 }
 
 @end
 
-@implementation themeHook
+// Stop-gap: Replace glass with reduced motion appearance
+// TODO: Investigate notificationcenter further
+hook(NSWorkspace)
 
--(double)_titlebarHeight {
-    return ZKOrig(double);
+BOOL isNotificationCenter(void) {
+    NSString* bundleId = [[NSBundle mainBundle] bundleIdentifier];
+    
+    return [bundleId isEqualToString:@"com.apple.notificationcenterui"];
 }
 
-+(double)_windowTitlebarTitleMinHeight:(unsigned long long)a0 {
-    return MIN(ZKOrig(double, a0), 21.0);
+- (BOOL)accessibilityDisplayShouldReduceMotion {
+    return isNotificationCenter() ? true : ZKOrig(BOOL);
 }
 
--(double)_minYTitlebarButtonsOffset {
-    return [self _titlebarHeight] - 22.0;
-}
+endhook
 
--(double)_toolbarOffsetIfTitleIsHidden {
-    if([[self window] titleVisibility] == NSWindowTitleVisible)
-        return -4.0;
-    else
-        return ZKOrig(double);
-}
-
--(double)_distanceFromToolbarBaseToTitlebar {
-    if ([[[self window] toolbar] isVisible] ){
-        if([[self window] titleVisibility] == NSWindowTitleVisible)
-            return ZKOrig(double) + 5.0;
-        else
-            return ZKOrig(double) - 1.0;
-    }
-    else {
-        return ZKOrig(double);
-    }
-}
-
--(double)_toolbarLeadingSpace {
-    return ZKOrig(double) + 2.0;
-}
-
--(double)_toolbarTrailingSpace {
-    return ZKOrig(double) + 2.0;
-}
-
-@end
-
-
-@implementation tbHook
-
-+(instancetype)trackingSeparatorToolbarItemWithIdentifier:(NSToolbarItemIdentifier)identifier splitView:(NSSplitView *)splitView dividerIndex:(NSInteger)dividerIndex {
-    return ZKOrig(tbHook*, identifier, nil, dividerIndex);
-}
-
--(BOOL)isHidden {
-    return true;
-}
-
-@end
-
-@implementation splitViewHook
-
--(BOOL)allowsFullHeightLayout {
-    return false;
-}
-
-@end
-
-@implementation fontHook
-+ (NSFont *)_windowTitleFontWithSubtitle:(BOOL)subtitle toolbarStyle:(NSWindowToolbarStyle)toolbarStyle {
-    return [NSFont systemFontOfSize:0];
-}
-
-+(NSFont*)titleBarFontOfSize:(CGFloat)fontSize {
-    return [NSFont systemFontOfSize:fontSize];
-}
-@end
-
-@implementation notificationHook
-- (void)setSoundName:(NSString *)soundName {
-    if ([soundName isEqual:NSUserNotificationDefaultSoundName])
-        return ZKOrig(void, @"Tri-tone");
-    return ZKOrig(void, soundName);
-}
-
-@end
-
-@implementation notificationHook2
-+ (id)_soundWithAlertType:(long long)a0 audioVolume:(id)a1 critical:(BOOL)a2 toneFileName:(id)a3 {
-    if(a3 == nil)
-        return ZKOrig(id, a0, a1, a2, @"Tri-Tone");
-    return ZKOrig(id, a0, a1, a2, a3);
-}
-
-@end

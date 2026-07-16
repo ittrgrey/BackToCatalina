@@ -1,341 +1,314 @@
-#import "BTCNSMutableArray.h"
+//
+//  BTCNSAppearance.m
+//  BackToCatalina
+//
+//  Created by ittrgrey on 13/07/2026.
+//
+
+#import <Cocoa/Cocoa.h>
+
+#import "BackToCatalina.h"
 #import "ZKSwizzle.h"
-#import <AppKit/NSAccessibility.h>
-#import <AppKit/NSAppearance.h>
-#import <os/lock.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class NSCompositeAppearance;
 
 @interface NSAppearance ()
-+ (NSCompositeAppearance *)_aquaAppearanceWithAccessibility:(BOOL)accessibility;
-+ (NSCompositeAppearance *)_darkAquaAppearanceWithAccessibility:(BOOL)accessibility;
++ (NSCompositeAppearance*)_aquaAppearanceWithAccessibility:(BOOL)accessibility;
++ (NSCompositeAppearance*)_darkAquaAppearanceWithAccessibility:(BOOL)accessibility;
 @end
 
 @interface NSCompositeAppearance : NSAppearance
-@property (copy) NSArray *appearances;
+@property (copy) NSArray* appearances;
 @property (copy) NSAppearanceName name;
-- (id)initWithAppearances:(NSArray *)appearances;
-@end
-
-@interface NSBuiltinAppearance : NSAppearance
-- (instancetype)initWithBundleResourceName:(NSString *)resourceName publicName:(NSString *)publicName catalystName:(NSString *)catalystName;
-@end
-
-@interface NSSystemAppearance : NSBuiltinAppearance
-@end
-
-@interface NSAccessibilitySystemAppearance : NSBuiltinAppearance
-@end
-
-@interface NSAquaAppearance : NSBuiltinAppearance
-@end
-
-@interface NSDarkAquaAppearance : NSBuiltinAppearance
-@end
-
-@interface NSVibrantLightAppearance : NSBuiltinAppearance
-@end
-
-@interface NSVibrantDarkAppearance : NSBuiltinAppearance
+- (id)initWithAppearances:(NSArray*)appearances;
 @end
 
 NS_ASSUME_NONNULL_END
 
-
 extern BOOL NSColorControlAccentIsGraphite(void);
 
-// ---------------------------------------------------------------------------
-// Appearance identity caching (recursion-crash fix)
-// ---------------------------------------------------------------------------
-// Every helper below is named "Cached" but the original code allocated a fresh
-// NSAppearance on every call, and the composite builders (_aquaAppearance &c.)
-// rebuilt a brand-new NSCompositeAppearance on every call. That breaks pointer
-// identity: +[NSAppearance appearanceNamed:] returned a different object each
-// time a name was resolved (and rebuilt a CoreUI theme renderer each time).
-//
-// Apps that observe a view's `appearance` via KVO/Combine and re-apply an
-// appearance resolved by name (Apple Notes does exactly this) then never
-// converge: -[NSView setAppearance:] always sees a "different" object, fires
-// the KVO change, the observer re-applies, and it recurses until the thread
-// stack overflows (EXC_BAD_ACCESS / SIGSEGV).
-//
-// The fix restores the identity invariant the real AppKit singletons have:
-// the leaf appearances are memoized once, and each composite is memoized per
-// (graphite, accessibility) state, so repeated resolution returns the very
-// same object. Rebuilding happens only when that state actually changes.
+// Declare every appearance sub-type the old system had
+// Accessibility
+NSAppearance* _accessibilitySystemAppearance;
 
-// Memoize an invariant NSBuiltinAppearance subclass. Each expansion site gets
-// its own static slot, so this yields one stable instance per helper function.
-#define BTC_CACHED_BUILTIN(CLASSNAME, RESOURCE, PUBLICNAME, CATALYST) \
-    ({ \
-        static id _btc_cached = nil; \
-        static dispatch_once_t _btc_once; \
-        dispatch_once(&_btc_once, ^{ \
-            _btc_cached = [[NSClassFromString(CLASSNAME) alloc] \
-                initWithBundleResourceName:(RESOURCE) \
-                                publicName:(PUBLICNAME) \
-                              catalystName:(CATALYST)]; \
-        }); \
-        _btc_cached; \
-    })
+// Aqua
+NSAppearance* _systemAppearance;
+NSAppearance* _graphiteAppearance;
+NSAppearance* _accessibilityAppearance;
+NSAppearance* _accessibilityGraphiteAppearance;
 
-static os_unfair_lock BTCCompositeCacheLock = OS_UNFAIR_LOCK_INIT;
+// Vibrant Dark
+NSAppearance* _darkAppearance;
+NSAppearance* _graphiteDarkAppearance;
+NSAppearance* _accessibilityDarkAppearance;
+NSAppearance* _accessibilityDarkGraphiteAppearance;
 
-static inline NSUInteger BTCCompositeKey(BOOL graphite, BOOL accessibility) {
-    return (graphite ? 2u : 0u) | (accessibility ? 1u : 0u);
-}
+// Vibrant Light
+NSAppearance* _vibrantLightAppearance;
+NSAppearance* _accessibilityVibrantLightAppearance;
 
-static id BTCCompositeCacheGet(__strong id *slots, NSUInteger key) {
-    os_unfair_lock_lock(&BTCCompositeCacheLock);
-    id value = slots[key];
-    os_unfair_lock_unlock(&BTCCompositeCacheLock);
-    return value;
-}
+// Dark Aqua
+NSAppearance* _darkAquaAppearance;
+NSAppearance* _graphiteDarkAquaAppearance;
+NSAppearance* _accessibilityDarkAquaAppearance;
+NSAppearance* _accessibilityGraphiteDarkAquaAppearance;
 
-// Stores `value` only if the slot is empty; returns whichever object wins, so
-// concurrent callers converge on a single shared instance.
-static id BTCCompositeCacheStore(__strong id *slots, NSUInteger key, id value) {
-    os_unfair_lock_lock(&BTCCompositeCacheLock);
-    if (!slots[key]) slots[key] = value;
-    id winner = slots[key];
-    os_unfair_lock_unlock(&BTCCompositeCacheLock);
-    return winner;
-}
-
-static NSAccessibilitySystemAppearance *NSCachedAccessibilitySystemCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSAccessibilitySystemAppearance", @"Catalina/AccessibilitySystemAppearance", @"NSAppearanceNameAccessibilitySystem", @"UIAppearanceHighContrastAny");
-}
-
-static NSAquaAppearance *NSCachedAquaCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSAquaAppearance", @"Catalina/SystemAppearance", @"NSAppearanceNameAqua", @"UIAppearanceLight");
-}
-
-static NSAquaAppearance *NSCachedGraphiteCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSAquaAppearance", @"Catalina/GraphiteAppearance", @"NSAppearanceNameAqua", @"UIAppearanceLight");
-}
-
-static NSAquaAppearance *NSCachedAccessibilityCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSAquaAppearance", @"Catalina/AccessibilityAppearance", @"NSAppearanceNameAccessibilityAqua", @"UIAppearanceHighContrastLight");
-}
-
-static NSAquaAppearance *NSCachedAccessibilityGraphiteCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSAquaAppearance", @"Catalina/AccessibilityGraphiteAppearance", @"NSAppearanceNameAccessibilityAqua", @"NSAppearanceNameAccessibilityAqua");
-}
-
-static NSVibrantDarkAppearance *NSCachedVibrantDarkCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSVibrantDarkAppearance", @"Catalina/DarkAppearance", @"NSAppearanceNameVibrantDark", @"NSAppearanceNameVibrantDark");
-}
-
-static NSVibrantDarkAppearance *NSCachedDarkGraphiteCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSVibrantDarkAppearance", @"Catalina/GraphiteDarkAppearance", @"NSAppearanceNameVibrantDark", @"NSAppearanceNameVibrantDark");
-}
-
-static NSVibrantDarkAppearance *NSCachedAccessibilityDarkCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSVibrantDarkAppearance", @"Catalina/AccessibilityDarkAppearance", @"NSAppearanceNameAccessibilityVibrantDark", @"NSAppearanceNameAccessibilityVibrantDark");
-}
-
-static NSVibrantDarkAppearance *NSCachedAccessibilityDarkGraphiteCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSVibrantDarkAppearance", @"Catalina/AccessibilityDarkGraphiteAppearance", @"NSAppearanceNameAccessibilityVibrantDark", @"NSAppearanceNameAccessibilityVibrantDark");
-}
-
-static NSVibrantLightAppearance *NSCachedVibrantLightCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSVibrantLightAppearance", @"Catalina/VibrantLightAppearance", @"NSAppearanceNameVibrantLight", @"NSAppearanceNameVibrantLight");
-}
-
-static NSVibrantLightAppearance *NSCachedAccessibilityVibrantLightCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSVibrantLightAppearance", @"Catalina/AccessibilityVibrantLightAppearance", @"NSAppearanceNameAccessibilityVibrantLight", @"NSAppearanceNameAccessibilityVibrantLight");
-}
-
-static NSDarkAquaAppearance *NSCachedDarkAquaCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSDarkAquaAppearance", @"Catalina/DarkAquaAppearance", @"NSAppearanceNameDarkAqua", @"UIAppearanceDark");
-}
-
-static NSDarkAquaAppearance *NSCachedDarkAquaGraphiteCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSDarkAquaAppearance", @"Catalina/GraphiteDarkAquaAppearance", @"NSAppearanceNameDarkAqua", @"UIAppearanceDark");
-}
-
-static NSDarkAquaAppearance *NSCachedDarkAquaAccessibilityCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSDarkAquaAppearance", @"Catalina/AccessibilityDarkAquaAppearance", @"NSAppearanceNameAccessibilityDarkAqua", @"UIAppearanceHighContrastDark");
-}
-
-static NSDarkAquaAppearance *NSCachedDarkAquaAccessibilityGraphiteCatalinaAppearance(void) {
-    return BTC_CACHED_BUILTIN(@"NSDarkAquaAppearance", @"Catalina/AccessibilityGraphiteDarkAquaAppearance", @"NSAppearanceNameAccessibilityGraphiteDarkAqua", @"NSAppearanceNameAccessibilityGraphiteDarkAqua");
-}
-
-hook(NSString)
-- (NSString *)stringByAppendingPathComponent:(NSString *)str {
-    if (str.length == 23 && ((NSString *)self).length == 28 && [str isEqualTo:@"SystemAppearance.bundle"] && [self isEqualTo:@"/System/Library/CoreServices"]) {
-        return @"/private/var/ammonia/core/tweaks/libBackToCatalina/SystemAppearance.bundle";
+// Load resources...
+__attribute__((constructor)) static void InitVisualStyle(void)
+{
+    // Check for our bundle first because otherwise, well, if it isn't there we can safely not apply anything and carry on as before...
+    if (carBundle)
+    {
+        _accessibilitySystemAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilitySystemAppearance" bundle:carBundle];
+        
+        _systemAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"SystemAppearance" bundle:carBundle];
+        _graphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"GraphiteAppearance" bundle:carBundle];
+        _accessibilityAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityAppearance" bundle:carBundle];
+        _accessibilityGraphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityGraphiteAppearance" bundle:carBundle];
+    
+        _darkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"DarkAppearance" bundle:carBundle];
+        _graphiteDarkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"GraphiteDarkAppearance" bundle:carBundle];
+        _accessibilityDarkAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityDarkAppearance" bundle:carBundle];
+        _accessibilityDarkGraphiteAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityDarkGraphiteAppearance" bundle:carBundle];
+        
+        _vibrantLightAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"VibrantLightAppearance" bundle:carBundle];
+        _accessibilityVibrantLightAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityVibrantLightAppearance" bundle:carBundle];
+        
+        _darkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"DarkAquaAppearance" bundle:carBundle];
+        _graphiteDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"GraphiteDarkAquaAppearance" bundle:carBundle];
+        _accessibilityDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityDarkAquaAppearance" bundle:carBundle];
+        _accessibilityGraphiteDarkAquaAppearance = [[NSAppearance alloc] initWithAppearanceNamed:@"AccessibilityGraphiteDarkAquaAppearance" bundle:carBundle];
+    
     }
-    return _orig(NSString *, str);
 }
-endhook
 
+#ifdef APPLY_BUNDLE
+// Apply safe hooks we need (not using NSString method...)
 hook(NSAppearance)
 
-+ (NSCompositeAppearance *)_aquaAppearanceWithAccessibility:(BOOL)accessibility {
-    static id cache[4];
-    BOOL grpahite = NSColorControlAccentIsGraphite();
-    NSUInteger key = BTCCompositeKey(grpahite, accessibility);
-    id cached = BTCCompositeCacheGet(cache, key);
-    if (cached) return cached;
-
-    NSCompositeAppearance *composite = _orig(NSCompositeAppearance *, accessibility);
-    NSMutableArray *compositeAppearances = [composite.appearances mutableCopy];
-    grpahite ? [compositeAppearances btc_insertObjectToFrontOfArray:NSCachedGraphiteCatalinaAppearance()] : nil;
-    if (accessibility) {
-        [compositeAppearances btc_insertObjectToFrontOfArray:NSCachedAccessibilitySystemCatalinaAppearance()];
-        [compositeAppearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityCatalinaAppearance()];
++ (NSAppearance*)_aquaAppearanceWithAccessibility:(BOOL)accessibility {
+    NSCompositeAppearance* composite = _orig(NSCompositeAppearance*, accessibility);
+    if (_accessibilitySystemAppearance && _accessibilityAppearance) {
+        NSMutableArray* appearances = [composite.appearances mutableCopy];
+        BOOL useGraphite = NSColorControlAccentIsGraphite();
+        useGraphite ? [appearances insertObject:_graphiteAppearance atIndex:0] : nil;
+        if (accessibility) {
+            [appearances insertObject:_accessibilitySystemAppearance atIndex:0];
+            [appearances insertObject:_accessibilityAppearance atIndex:0];
+        }
+        if (useGraphite && accessibility) {
+            [appearances insertObject:_accessibilityGraphiteAppearance atIndex:0];
+        }
+        composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
     }
-    if (grpahite && accessibility) {
-        [compositeAppearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityGraphiteCatalinaAppearance()];
-    }
-    composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:compositeAppearances];
-    return BTCCompositeCacheStore(cache, key, composite);
+    return composite;
 }
 
-+ (NSAppearance *)_aquaAppearance {
-    static id cache[4];
-    BOOL useAccessibility = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast;
-    BOOL useGraphite = NSColorControlAccentIsGraphite();
-    NSUInteger key = BTCCompositeKey(useGraphite, useAccessibility);
-    id cached = BTCCompositeCacheGet(cache, key);
-    if (cached) return cached;
-
-    NSCompositeAppearance *composite = _orig(NSCompositeAppearance *);
-    NSMutableArray *appearances = [composite.appearances mutableCopy];
-
-    [appearances btc_insertObjectToFrontOfArray:NSCachedAquaCatalinaAppearance()];
-    if (useGraphite) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedGraphiteCatalinaAppearance()];
++ (NSAppearance*)_aquaAppearance {
+    NSCompositeAppearance* composite = _orig(NSCompositeAppearance*);
+    if (_systemAppearance) {
+        NSMutableArray* appearances = [composite.appearances mutableCopy];
+        BOOL useAccessibility = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast;
+        BOOL useGraphite = NSColorControlAccentIsGraphite();
+        [appearances insertObject:_systemAppearance atIndex:0];
+        
+        if (useGraphite) {
+            [appearances insertObject:_graphiteAppearance atIndex:0];
+        }
+        
+        if (useAccessibility) {
+            [appearances insertObject:_accessibilitySystemAppearance atIndex:0];
+            [appearances insertObject:_accessibilityAppearance atIndex:0];
+        }
+        
+        if (useGraphite && useAccessibility) {
+            [appearances insertObject:_accessibilityGraphiteAppearance atIndex:0];
+        }
+        
+        composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
+        composite.name = @"NSAppearanceNameAqua";
     }
-    if (useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilitySystemCatalinaAppearance()];
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityCatalinaAppearance()];
-    }
-    if (useGraphite && useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityGraphiteCatalinaAppearance()];
-    }
-    composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
-    composite.name = @"NSAppearanceNameAqua";
-    return BTCCompositeCacheStore(cache, key, composite);
+    return composite;
 }
 
-+ (NSAppearance *)_vibrantDarkAppearance {
-    static id cache[4];
-    BOOL useAccessibility = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast;
-    BOOL useGraphite = NSColorControlAccentIsGraphite();
-    NSUInteger key = BTCCompositeKey(useGraphite, useAccessibility);
-    id cached = BTCCompositeCacheGet(cache, key);
-    if (cached) return cached;
-
-    NSCompositeAppearance *composite = _orig(NSCompositeAppearance *);
-    NSMutableArray *appearances = [composite.appearances mutableCopy];
-    [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaCatalinaAppearance()];
-    useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaGraphiteCatalinaAppearance()] : nil;
-    if (useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedVibrantDarkCatalinaAppearance()];
-        useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedDarkGraphiteCatalinaAppearance()] : nil;
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilitySystemCatalinaAppearance()];
-        [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaAccessibilityCatalinaAppearance()];
-        useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaAccessibilityGraphiteCatalinaAppearance()] : nil;
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityDarkCatalinaAppearance()];
-        useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityDarkGraphiteCatalinaAppearance()] : nil;
-    } else {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedVibrantDarkCatalinaAppearance()];
-        useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedDarkGraphiteCatalinaAppearance()] : nil;
++ (NSAppearance*)_vibrantDarkAppearance {
+    NSCompositeAppearance* composite = _orig(NSCompositeAppearance*);
+    if (_darkAquaAppearance && _darkAppearance) {
+        NSMutableArray* appearances = [composite.appearances mutableCopy];
+        BOOL useAccessibility = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast;
+        BOOL useGraphite = NSColorControlAccentIsGraphite();
+        [appearances insertObject:_darkAquaAppearance atIndex:0];
+        
+        if (useGraphite) {
+            [appearances insertObject:_graphiteDarkAquaAppearance atIndex:0];
+        }
+        
+        [appearances insertObject:_darkAppearance atIndex:0];
+        
+        if (useGraphite) {
+            [appearances insertObject:_graphiteDarkAppearance atIndex:0];
+        }
+        
+        if (useAccessibility) {
+            [appearances insertObject:_accessibilitySystemAppearance atIndex:0];
+            [appearances insertObject:_accessibilityDarkAquaAppearance atIndex:0];
+            
+            if (useGraphite) {
+                [appearances insertObject:_accessibilityDarkGraphiteAppearance atIndex:0];
+            }
+            
+            [appearances insertObject:_accessibilityDarkAppearance atIndex:0];
+            
+            if (useGraphite) {
+                [appearances insertObject:_accessibilityDarkGraphiteAppearance atIndex:0];
+            }
+        }
+        
+        composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
+        composite.name = @"NSAppearanceNameVibrantDark";
     }
-    composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
-    composite.name = @"NSAppearanceNameVibrantDark";
-    return BTCCompositeCacheStore(cache, key, composite);
+    return composite;
 }
 
-+ (NSAppearance *)_vibrantLightAppearance {
-    static id cache[4];
-    BOOL useAccessibility = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast;
-    BOOL useGraphite = NSColorControlAccentIsGraphite();
-    NSUInteger key = BTCCompositeKey(useGraphite, useAccessibility);
-    id cached = BTCCompositeCacheGet(cache, key);
-    if (cached) return cached;
-
-    NSCompositeAppearance *composite = _orig(NSCompositeAppearance *);
-    NSMutableArray *appearances = [composite.appearances mutableCopy];
-    [appearances btc_insertObjectToFrontOfArray:NSCachedAquaCatalinaAppearance()];
-    useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedGraphiteCatalinaAppearance()] : nil;
-    if (useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilitySystemCatalinaAppearance()];
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityCatalinaAppearance()];
-        useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityGraphiteCatalinaAppearance()] : nil;
++ (NSAppearance*)_vibrantLightAppearance {
+    NSCompositeAppearance* composite = _orig(NSCompositeAppearance*);
+    if (_systemAppearance && _vibrantLightAppearance) {
+        NSMutableArray* appearances = [composite.appearances mutableCopy];
+        BOOL useAccessibility = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast;
+        BOOL useGraphite = NSColorControlAccentIsGraphite();
+        [appearances insertObject:_systemAppearance atIndex:0];
+        
+        if (useGraphite) {
+            [appearances insertObject:_graphiteAppearance atIndex:0];
+        }
+        
+        if (useAccessibility) {
+            [appearances insertObject:_accessibilitySystemAppearance atIndex:0];
+            [appearances insertObject:_accessibilityAppearance atIndex:0];
+            
+            if (useGraphite) {
+                [appearances insertObject:_accessibilityGraphiteAppearance atIndex:0];
+            }
+        } else {
+            [appearances insertObject:_vibrantLightAppearance atIndex:0];
+        }
+        
+        composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
+        composite.name = @"NSAppearanceNameVibrantLight";
     }
-    [appearances btc_insertObjectToFrontOfArray:NSCachedVibrantLightCatalinaAppearance()];
-    useAccessibility ? [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilityVibrantLightCatalinaAppearance()] : nil;
-    composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
-    composite.name = @"NSAppearanceNameVibrantLight";
-    return BTCCompositeCacheStore(cache, key, composite);
+    return composite;
 }
 
-+ (NSAppearance *)_darkAquaAppearanceWithAccessibility:(BOOL)useAccessibility {
-    static id cache[4];
-    BOOL useGraphite = NSColorControlAccentIsGraphite();
-    NSUInteger key = BTCCompositeKey(useGraphite, useAccessibility);
-    id cached = BTCCompositeCacheGet(cache, key);
-    if (cached) return cached;
-
-    NSCompositeAppearance *composite = _orig(NSCompositeAppearance *, useAccessibility);
-    NSMutableArray *appearances = [composite.appearances mutableCopy];
-    if (useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilitySystemCatalinaAppearance()];
-        [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaAccessibilityCatalinaAppearance()];
++ (NSAppearance*)_darkAquaAppearanceWithAccessibility:(BOOL)accessibility {
+    NSCompositeAppearance* composite = _orig(NSCompositeAppearance*, accessibility);
+    if (_accessibilitySystemAppearance && _accessibilityAppearance) {
+        NSMutableArray* appearances = [composite.appearances mutableCopy];
+        BOOL useGraphite = NSColorControlAccentIsGraphite();
+        useGraphite ? [appearances insertObject:_graphiteAppearance atIndex:0] : nil;
+        
+        if (accessibility) {
+            [appearances insertObject:_accessibilitySystemAppearance atIndex:0];
+            [appearances insertObject:_accessibilityDarkAquaAppearance atIndex:0];
+        }
+        
+        if (useGraphite) {
+            [appearances insertObject:_graphiteDarkAquaAppearance atIndex:0];
+        }
+        
+        if (useGraphite && accessibility) {
+            [appearances insertObject:_accessibilityGraphiteDarkAquaAppearance atIndex:0];
+        }
+        
+        composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
     }
-
-    if (useGraphite) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaGraphiteCatalinaAppearance()];
-    }
-    
-    if (useGraphite && useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaAccessibilityGraphiteCatalinaAppearance()];
-    }
-    composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
-    return BTCCompositeCacheStore(cache, key, composite);
+    return composite;
 }
 
-+ (NSAppearance *)_darkAquaAppearance {
-    static id cache[4];
-    BOOL useAccessibility = NSWorkspace.sharedWorkspace.accessibilityDisplayShouldIncreaseContrast;
-    BOOL useGraphite = NSColorControlAccentIsGraphite();
-    NSUInteger key = BTCCompositeKey(useGraphite, useAccessibility);
-    id cached = BTCCompositeCacheGet(cache, key);
-    if (cached) return cached;
-
-    NSCompositeAppearance *composite = _orig(NSCompositeAppearance *);
-    NSMutableArray *appearances = [composite.appearances mutableCopy];
-    [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaCatalinaAppearance()];
-    useGraphite ? [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaGraphiteCatalinaAppearance()] : nil;
-    if (useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedAccessibilitySystemCatalinaAppearance()];
-        [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaAccessibilityCatalinaAppearance()];
++ (NSAppearance*)_darkAquaAppearance {
+    NSCompositeAppearance* composite = _orig(NSCompositeAppearance*);
+    if (_darkAquaAppearance) {
+        NSMutableArray* appearances = [composite.appearances mutableCopy];
+        BOOL useGraphite = NSColorControlAccentIsGraphite();
+        [appearances insertObject:_darkAquaAppearance atIndex:0];
+        
+        if (useGraphite) {
+            [appearances insertObject:_graphiteDarkAquaAppearance atIndex:0];
+        }
+        
+        composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
+        composite.name = @"NSAppearanceNameDarkAqua";
     }
-    if (useGraphite && useAccessibility) {
-        [appearances btc_insertObjectToFrontOfArray:NSCachedDarkAquaAccessibilityGraphiteCatalinaAppearance()];
-    }
-    composite = [[NSClassFromString(@"NSCompositeAppearance") alloc] initWithAppearances:appearances];
-    composite.name = @"NSAppearanceNameDarkAqua";
-    return BTCCompositeCacheStore(cache, key, composite);
+    return composite;
 }
+
+// These fix toolbar buttons being translucent in some places... Bizarre but okay
++ (NSAppearance*)_fauxVibrantDarkAppearance {
+    return [self _vibrantDarkAppearance];
+}
+
++ (NSAppearance*)_fauxVibrantLightAppearance {
+    return [self _vibrantLightAppearance];
+}
+
+// Disabling this value reverts older-style controls (i.e. NSButton) that existed before macOS 11 to the colouring used in versions 10.10 to 10.13
+// Documented here incase it is needed by anyone in the future
+//- (BOOL)_allowsSystemControlTintColors {
+//    return YES;
+//}
+
 endhook
+#endif
+
+// A back-stop: Even if solarium is somehow switched on system-wide, we will disable it for all applications on our end...
+static BOOL IsSolariumEnabled(void) {
+    return NO;
+}
+
+// https://stackoverflow.com/questions/51672124/how-can-dark-mode-be-detected-on-macos-10-14
+BOOL currentAppearanceIsDark(void)
+{
+    NSAppearance* appearance = NSApplication.sharedApplication.effectiveAppearance;
+    if (@available(macOS 10.14, *)) {
+        NSAppearanceName basicAppearance = [appearance bestMatchFromAppearancesWithNames:@[
+            NSAppearanceNameAqua,
+            NSAppearanceNameDarkAqua
+        ]];
+        return [basicAppearance isEqualToString:NSAppearanceNameDarkAqua];
+    } else {
+        return NO;
+    }
+}
 
 hook(NSCompositeAppearance)
+
+- (NSAppearance*)_appearanceForVibrantContent {
+    return currentAppearanceIsDark() ? [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantDark"] : [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantLight"];
+}
+
+- (NSAppearance*)_appearanceForNonVibrantContent {
+    return currentAppearanceIsDark() ? [NSAppearance appearanceNamed:@"NSAppearanceNameDarkAqua"] : [NSAppearance appearanceNamed:@"NSAppearanceNameAqua"];
+}
+
 - (BOOL)_usesMetricsAppearance {
     return NO;
 }
+
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
+
 endhook
 
 // Customize Toolbar: show button with bezels
 hook(NSVibrantDarkAppearance)
 
-- (NSAppearance *)_appearanceForNonVibrantContent {
+- (NSAppearance*)_appearanceForVibrantContent {
+    return [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantDark"];
+}
+
+- (NSAppearance*)_appearanceForNonVibrantContent {
     return [NSAppearance appearanceNamed:@"NSAppearanceNameDarkAqua"];
 }
 
@@ -343,11 +316,19 @@ hook(NSVibrantDarkAppearance)
     return NO;
 }
 
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
+
 endhook
 
 hook(NSVibrantLightAppearance)
 
-- (NSAppearance *)_appearanceForNonVibrantContent {
+- (NSAppearance*)_appearanceForVibrantContent {
+    return [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantLight"];
+}
+
+- (NSAppearance*)_appearanceForNonVibrantContent {
     return [NSAppearance appearanceNamed:@"NSAppearanceNameAqua"];
 }
 
@@ -355,16 +336,49 @@ hook(NSVibrantLightAppearance)
     return NO;
 }
 
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
+
 endhook
 
 hook(NSAquaAppearance)
+
+- (NSAppearance*)_appearanceForVibrantContent {
+    return [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantLight"];
+}
+
+- (NSAppearance*)_appearanceForNonVibrantContent {
+    return [NSAppearance appearanceNamed:@"NSAppearanceNameAqua"];
+}
+
 - (BOOL)_usesMetricsAppearance {
     return NO;
 }
+
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
+
 endhook
 
 hook(NSDarkAquaAppearance)
+
+- (NSAppearance*)_appearanceForVibrantContent {
+    return [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantDark"];
+}
+
+- (NSAppearance*)_appearanceForNonVibrantContent {
+    return [NSAppearance appearanceNamed:@"NSAppearanceNameDarkAqua"];
+}
+
 - (BOOL)_usesMetricsAppearance {
     return NO;
 }
+
+- (BOOL)_wantsSolarium {
+    return IsSolariumEnabled();
+}
+
 endhook
+
