@@ -13,4 +13,5 @@ hook(NSMenuItem)
 - (NSInteger)indentationLevel {
     return MAX(1, ZKOrig(NSInteger));
 }
+
 endhook
