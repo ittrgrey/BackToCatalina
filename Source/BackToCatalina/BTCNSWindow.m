@@ -52,6 +52,10 @@ hook(NSWindow)
 #endif
 }
 
+- (long long)titleVisibility {
+    return [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.systempreferences"] ? 1 : ZKOrig(long long);
+}
+
 endhook
 
 hook(NSSheetMoveHelper)
