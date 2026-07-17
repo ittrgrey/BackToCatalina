@@ -23,4 +23,5 @@ hook(NSTableViewStyleData)
 - (double)rowHeight {
     return MIN(ZKOrig(double), 24);
 }
+
 endhook
