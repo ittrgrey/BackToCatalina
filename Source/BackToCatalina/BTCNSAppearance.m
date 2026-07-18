@@ -270,29 +270,32 @@ static BOOL IsSolariumEnabled(void) {
 BOOL currentAppearanceIsDark(void)
 {
     NSAppearance* appearance = NSApplication.sharedApplication.effectiveAppearance;
-    if (@available(macOS 10.14, *)) {
-        NSAppearanceName basicAppearance = [appearance bestMatchFromAppearancesWithNames:@[
-            NSAppearanceNameAqua,
-            NSAppearanceNameDarkAqua
-        ]];
-        return [basicAppearance isEqualToString:NSAppearanceNameDarkAqua];
-    } else {
-        return NO;
-    }
+    NSAppearanceName basicAppearance = [appearance bestMatchFromAppearancesWithNames:@[
+        NSAppearanceNameAqua,
+        NSAppearanceNameDarkAqua
+    ]];
+    
+    return [basicAppearance isEqualToString:NSAppearanceNameDarkAqua];
 }
 
 hook(NSCompositeAppearance)
 
 - (NSAppearance*)_appearanceForVibrantContent {
-    // Control Center is deterministic based on the wallpaper - let it do its own thing
-    if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.controlcenter"]) return ZKOrig(NSAppearance*);
+    // Control Center and Spotlight are deterministic based on the wallpaper - let them do their own thing
+    // Clock app toolbar is meant to be dark at all times
+    if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.controlcenter"] ||
+        [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.Spotlight"] ||
+        [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.clock"]) return ZKOrig(NSAppearance*);
     
     return currentAppearanceIsDark() ? [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantDark"] : [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantLight"];
 }
 
 - (NSAppearance*)_appearanceForNonVibrantContent {
-    // Control Center is deterministic based on the wallpaper - let it do its own thing
-    if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.controlcenter"]) return ZKOrig(NSAppearance*);
+    // Control Center and Spotlight are deterministic based on the wallpaper - let them do their own thing
+    // Clock app toolbar is meant to be dark at all times
+    if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.controlcenter"] ||
+        [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.Spotlight"] ||
+        [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.clock"]) return ZKOrig(NSAppearance*);
     
     return currentAppearanceIsDark() ? [NSAppearance appearanceNamed:@"NSAppearanceNameDarkAqua"] : [NSAppearance appearanceNamed:@"NSAppearanceNameAqua"];
 }
