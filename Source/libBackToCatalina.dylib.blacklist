@@ -192,10 +192,7 @@ com.apple.hiservices-xpcservice
 talagent
 Firefox
 WeChat
-ControlCenter
-Dock
 Magnifier
-Spotlight
 com.apple.WebKit.WebContent
 com.apple.WebKit.GPU
 com.apple.dock.extra

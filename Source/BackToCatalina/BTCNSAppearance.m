@@ -284,10 +284,16 @@ BOOL currentAppearanceIsDark(void)
 hook(NSCompositeAppearance)
 
 - (NSAppearance*)_appearanceForVibrantContent {
+    // Control Center is deterministic based on the wallpaper - let it do its own thing
+    if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.controlcenter"]) return ZKOrig(NSAppearance*);
+    
     return currentAppearanceIsDark() ? [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantDark"] : [NSAppearance appearanceNamed:@"NSAppearanceNameVibrantLight"];
 }
 
 - (NSAppearance*)_appearanceForNonVibrantContent {
+    // Control Center is deterministic based on the wallpaper - let it do its own thing
+    if ([NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.controlcenter"]) return ZKOrig(NSAppearance*);
+    
     return currentAppearanceIsDark() ? [NSAppearance appearanceNamed:@"NSAppearanceNameDarkAqua"] : [NSAppearance appearanceNamed:@"NSAppearanceNameAqua"];
 }
 
