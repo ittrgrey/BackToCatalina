@@ -202,3 +202,18 @@ hook(ToolbarDownloadsButton)
 
 }
 endhook
+
+// For some reason, Safari uses a lot of duplicated classes that eschew the NeXTSTEP prefix
+// The procedure matches the one applied elsewhere for NSTabBarViewButton
+hook(TabBarViewButton)
+
+- (BOOL)isOpaque {
+    // Unhide the top border view
+    NSView* topBorderView = ZKHookIvar(self, NSView*, "_topBorderView");
+    topBorderView.hidden = NO;
+    
+    // Return our original value since, well, we don't actually need to change the function output :P
+    return ZKOrig(BOOL);
+}
+
+endhook
