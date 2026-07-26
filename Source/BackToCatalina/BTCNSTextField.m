@@ -61,7 +61,7 @@ hook(NSTextField)
     // The header should always have this identifier
     if ([identifier isEqualToString:@"xSidebarHeader"]) {
         // Check that the origin value is already lower than it ought to be to avoid affecting visuals when NSSidebarUsesGoldenStyles is enabled
-        if (origin.x <= 6) origin.x += 6.0;
+        if (origin.x <= 6.0) origin.x += 6.0;
     }
     
     return ZKOrig(void, origin);
