@@ -66,15 +66,6 @@ static NSAlert *performingSurgeryOnAlert;
 
 endhook
 
-hook(NSButton)
-- (void)setControlSize:(NSControlSize)controlSize {
-    // NSControlSizeLarge did not exist prior to macOS 11
-    if (controlSize == NSControlSizeLarge) controlSize = NSControlSizeRegular;
-    
-    return _orig(void, shouldForceRegularControlSize ? NSControlSizeRegular : controlSize);
-}
-endhook
-
 hook(NSLayoutConstraint)
 + (NSArray<NSLayoutConstraint *> *)constraintsWithVisualFormat:(NSString *)format options:(NSLayoutFormatOptions)opts metrics:(nullable NSDictionary<NSString *, id> *)metrics views:(NSDictionary<NSString *, id> *)views {
     if (performingSurgeryOnAlert) {
