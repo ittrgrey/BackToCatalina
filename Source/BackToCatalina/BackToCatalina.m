@@ -49,9 +49,7 @@ WEAK_IMPORT_ATTRIBUTE
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
     
     // Disable Solarium by hooking an exported function system-wide, as a fallback and additional layer to ensure it is disabled
-    DobbyHook(DobbySymbolResolver(NULL, "_os_feature_enabled_impl"),
-              BTC_os_feature_enabled_impl,
-                  &_os_feature_enabled_impl);
+    //DobbyHook(DobbySymbolResolver(NULL, "_os_feature_enabled_impl"), BTC_os_feature_enabled_impl, &_os_feature_enabled_impl);
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
               CompatWidgetNew,
