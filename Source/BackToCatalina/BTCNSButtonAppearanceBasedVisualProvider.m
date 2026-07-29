@@ -21,9 +21,7 @@ hook(NSButtonAppearanceBasedVisualProvider)
     // This then mostly resolves the issue, except for on alert dialogs where the button state is held whilst the animation plays out, but this is likely another issue
     
     NSButtonBezelConfiguration* cfg = [self valueForKey:@"_bezelConfiguration"];
-    long long state = cfg.interactionState;
-    
-    return (state == 0) ? ZKOrig(BOOL) : YES;
+    return (cfg.interactionState == 0) ? ZKOrig(BOOL) : YES;
 }
 endhook
 
