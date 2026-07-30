@@ -28,16 +28,14 @@ static void CatalinaDock_LayoutSublayers(CALayer* layer) {
         mask = (kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner);
     } else if ([orientation isEqualToString:@"right"]) {
         mask = (kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner);
-    }
-    
-    material.maskedCorners = innerRim.maskedCorners = rim.maskedCorners = mask;
-    
-    // We only need to correct the rim border position when the dock is at the bottom of the screen
-    // It seems to already be occluded on the left/right orientations so let's just go along with that
-    if ([orientation isEqualToString:@"bottom"]) {
+    } else { // bottom orientation
+        // We only need to correct the rim border position when the dock is at the bottom of the screen
+        // It seems to already be occluded on the left/right orientations so let's just go along with that
         innerRim.position = CGPointMake(innerRim.position.x, material.position.y - 1);
         innerRim.bounds = CGRectMake(innerRim.bounds.origin.x, innerRim.bounds.origin.y, innerRim.bounds.size.width, material.bounds.size.height + 2);
     }
+    
+    material.maskedCorners = innerRim.maskedCorners = rim.maskedCorners = mask;
     
     for (CALayer* sublayer in material.sublayers) {
         sublayer.cornerRadius = 0;
@@ -50,11 +48,13 @@ static CGRect CatalinaDock_SetFrame(CGRect frame) {
     NSString* orientation = GetDockOrientation();
     int offset = 6;
     
-    if ([orientation isEqualToString:@"bottom"]) {
-        frame.origin.y -= offset;
-    } else if ([orientation isEqualToString:@"left"]) {
+    if ([orientation isEqualToString:@"left"]) {
         frame.origin.x -= offset;
-    } // Right side doesn't need offset calculation
+    } else if ([orientation isEqualToString:@"right"]) {
+        // do nothing - this would be a switch select statement but AFAICS this isn't possible with obj-c appkit api
+    } else {
+        frame.origin.y -= offset; // covers bottom orientation
+    }
     
     return frame;
 }
