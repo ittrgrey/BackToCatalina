@@ -46,7 +46,7 @@ hook(NSWindow)
 // Tahoe (well, earlier versions of it) seems to read from this value exclusively for the corner radius. Why, I'm not sure...
 - (double)_bottomCornerRadius {
 #ifdef APPLY_BUNDLE
-    return 6.0;
+    return 5.0;
 #else
     return 9.0; // We check if the theme bundle is being applied - use standard Sequoia radius if not
 #endif

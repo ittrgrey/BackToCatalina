@@ -1,6 +1,6 @@
 # BackToCatalina Beta
 
-Restores macOS Catalina UI on newer versions of macOS. Works on both Apple silicon and Intel running macOS Tahoe, macOS Sequoia, macOS Sonoma, macOS Ventura, and macOS Tahoe. Support for macOS Golden Gate is heavily experimental. Featured on [MacGeneration](https://www.macg.co/macos/2026/01/backtocatalina-propose-de-revenir-linterface-de-macos-1015-sur-les-mac-recents-306269) and [MacTechNews](https://www.mactechnews.de/news/article/BackToCatalina-Benutzeroberflaeche-von-macOS-10-15-mit-modernen-macOS-Varianten-nutzen-188707.html). Contributions are welcome!
+Restores macOS Catalina UI on newer versions of macOS. Works on both Apple silicon and Intel running macOS Tahoe, macOS Sequoia, macOS Sonoma and macOS Ventura. Support for macOS Golden Gate is heavily experimental. Featured on [MacGeneration](https://www.macg.co/macos/2026/01/backtocatalina-propose-de-revenir-linterface-de-macos-1015-sur-les-mac-recents-306269) and [MacTechNews](https://www.mactechnews.de/news/article/BackToCatalina-Benutzeroberflaeche-von-macOS-10-15-mit-modernen-macOS-Varianten-nutzen-188707.html). Contributions are welcome!
 
 ![BackToCatalina](Source/Screenshots/Screenshot.png)
 

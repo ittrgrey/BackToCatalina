@@ -1,11 +1,14 @@
-#import <Cocoa/Cocoa.h>
-#import "ZKSwizzle.h"
+//
+//  BTCNSControl.m
+//  BackToCatalina
+//
+//  Created by ittrgrey on 29/07/2026.
+//
 
-hook(NSSliderCell)
-- (BOOL)_usesModernStyleForAppearance:(id)appearance {
-    // Slider in Music app
-    return NO;
-}
+#include <Cocoa/Cocoa.h>
+#include "ZKSwizzle.h"
+
+hook(NSControl)
 
 - (void)setControlSize:(NSControlSize)controlSize {
     // NSControlSizeLarge did not exist prior to macOS 11
