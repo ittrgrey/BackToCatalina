@@ -24,6 +24,8 @@ hook(NSTextField)
 }
 
 - (BOOL)_wantsSeparatedSubviews {
+    if (!isTahoeOrLater) return NO; // The function doesn't exist before Tahoe
+    
     return ZKOrig(BOOL);
 }
 
