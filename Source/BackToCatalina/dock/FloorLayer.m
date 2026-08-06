@@ -25,11 +25,15 @@ static void CatalinaDock_LayoutSublayers(CALayer* layer) {
     CACornerMask mask = (kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner);
     if ([orientation isEqualToString:@"left"]) {
         mask = (kCALayerMaxXMinYCorner | kCALayerMaxXMaxYCorner);
+        
+        innerRim.position = CGPointMake(innerRim.position.x - 1, material.position.y);
+        innerRim.bounds = CGRectMake(innerRim.bounds.origin.x, innerRim.bounds.origin.y, innerRim.bounds.size.width + 2, material.bounds.size.height);
     } else if ([orientation isEqualToString:@"right"]) {
         mask = (kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner);
+        
+        innerRim.position = CGPointMake(innerRim.position.x + 1, material.position.y);
+        innerRim.bounds = CGRectMake(innerRim.bounds.origin.x, innerRim.bounds.origin.y, innerRim.bounds.size.width + 2, material.bounds.size.height);
     } else { // bottom orientation
-        // We only need to correct the rim border position when the dock is at the bottom of the screen
-        // It seems to already be occluded on the left/right orientations so let's just go along with that
         innerRim.position = CGPointMake(innerRim.position.x, material.position.y - 1);
         innerRim.bounds = CGRectMake(innerRim.bounds.origin.x, innerRim.bounds.origin.y, innerRim.bounds.size.width, material.bounds.size.height + 2);
     }
@@ -45,14 +49,16 @@ static void CatalinaDock_LayoutSublayers(CALayer* layer) {
 
 static CGRect CatalinaDock_SetFrame(CGRect frame) {
     NSString* orientation = GetDockOrientation();
-    int offset = 6;
+    int offset = 5;
     
     if ([orientation isEqualToString:@"left"]) {
         frame.origin.x -= offset;
+        frame.size.width += offset;
     } else if ([orientation isEqualToString:@"right"]) {
         // do nothing - this would be a switch select statement but AFAICS this isn't possible with obj-c appkit api
     } else {
         frame.origin.y -= offset; // covers bottom orientation
+        frame.size.height += offset;
     }
     
     return frame;
@@ -81,9 +87,22 @@ hook(FloorLayer)
     CatalinaDock_LayoutSublayers((CALayer*)self);
 }
 
-- (void)setFrame:(CGRect)frame {
-    frame = CatalinaDock_SetFrame(frame);
-    return ZKOrig(void, frame);
+// Pre-Tahoe requires this for sizing the frame
+// The function was replaced in Tahoe with DockBar->setFloorFrame
+- (void)updateFrame:(CGRect)frame tileSize:(float)size {
+    NSString* orientation = [[[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.apple.dock"] valueForKey:@"orientation"];
+    if ([orientation isEqualToString:@"left"]) {
+        frame.origin.x -= 5;
+        frame.size.width += 5;
+    }
+    else if ([orientation isEqualToString:@"right"]) {
+        frame.size.width += 5;
+    }
+    else {
+        frame.origin.y -= 5;
+        frame.size.height += 5;
+    }
+    ZKOrig(void, frame, size);
 }
 
 endhook
