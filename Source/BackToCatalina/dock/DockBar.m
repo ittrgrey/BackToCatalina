@@ -10,6 +10,10 @@
 
 hook(DockBar)
 
+- (float)distanceTop {
+    return ZKOrig(float) + 1.0;
+}
+
 - (float)distanceBottom {
     return ZKOrig(float) - 5.0;
 }

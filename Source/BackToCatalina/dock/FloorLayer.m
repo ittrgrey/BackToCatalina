@@ -88,7 +88,7 @@ hook(FloorLayer)
 }
 
 // Pre-Tahoe requires this for sizing the frame
-// The function was replaced in Tahoe with DockBar->setFloorFrame
+// The function was replaced in Tahoe with DockBar->setFloorFrame and also requires use of FloorLayer->setFrame that we don't need here
 - (void)updateFrame:(CGRect)frame tileSize:(float)size {
     NSString* orientation = [[[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.apple.dock"] valueForKey:@"orientation"];
     if ([orientation isEqualToString:@"left"]) {
