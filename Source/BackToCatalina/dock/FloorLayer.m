@@ -10,14 +10,15 @@
 
 /// Function implementations
 static void CatalinaDock_LayoutSublayers(CALayer* layer) {
-    CALayer* shadow = ZKHookIvar(layer, CALayer*, "_shadowLayer");
-    shadow.hidden = YES; // Didn't exist before Big Sur - unwanted
-    
     NSString* orientation = GetDockOrientation();
     int catalinaRadius = 5;
     
     CALayer* material = ZKHookIvar(layer, CALayer*, "_materialLayer");
     CALayer* innerRim = ZKHookIvar(layer, CALayer*, "_innerRimLayer");
+    
+    // On light mode this part doesn't generally render prior to Big Sur
+    innerRim.hidden = ![[[NSAppearance currentDrawingAppearance] name] containsString:@"Dark"];
+    
     CALayer* rim = ZKHookIvar(layer, CALayer*, "_rim");
     
     material.cornerRadius = innerRim.cornerRadius = rim.cornerRadius = catalinaRadius;
