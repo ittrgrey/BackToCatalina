@@ -56,6 +56,16 @@ hook(NSWindow)
     return [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.systempreferences"] ? 1 : ZKOrig(long long);
 }
 
+// Get rid of the new translucent separator for standard titlebars
+- (NSTitlebarSeparatorStyle)titlebarSeparatorStyle {
+    return NSTitlebarSeparatorStyleNone;
+}
+
+// Get rid of the new translucent separator for toolbar titlebars
+- (NSTitlebarSeparatorStyle)contentTitlebarSeparatorStyle {
+    return NSTitlebarSeparatorStyleNone;
+}
+
 endhook
 
 hook(NSSheetMoveHelper)
