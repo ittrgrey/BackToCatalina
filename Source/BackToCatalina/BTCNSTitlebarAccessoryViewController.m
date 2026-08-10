@@ -39,3 +39,12 @@ hook(NSTabBarViewButton)
 }
 
 endhook
+
+hook(_NSTitlebarDecorationView)
+
+// This brings back the old bottom separator - we just have to eliminate the "new" separator style elsewhere, in NSWindow
+- (void)_updateBottomSeparatorLayer {
+    return;
+}
+
+endhook
