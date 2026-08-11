@@ -50,3 +50,14 @@ hook(NSTabBarViewButton)
 
 endhook
 
+hook(NSTabBarNewTabButton)
+- (CGRect)frame {
+    CGRect frame = ZKOrig(CGRect);
+    
+    // Restore the original width used in Catalina
+    frame.size.width = 24;
+    
+    // Return the frame
+    return frame;
+}
+endhook
