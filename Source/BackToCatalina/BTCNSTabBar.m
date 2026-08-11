@@ -51,6 +51,7 @@ hook(NSTabBarViewButton)
 endhook
 
 hook(NSTabBarNewTabButton)
+
 - (CGRect)frame {
     CGRect frame = ZKOrig(CGRect);
     
@@ -60,4 +61,5 @@ hook(NSTabBarNewTabButton)
     // Return the frame
     return frame;
 }
+
 endhook

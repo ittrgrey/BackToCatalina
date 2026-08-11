@@ -15,6 +15,10 @@ hook(NSTitlebarAccessoryViewController)
     return NO;
 }
 
+- (double)fullScreenMinHeight {
+    return 25; // Reverts height for unified toolbar as used in Safari etc
+}
+
 endhook
 
 hook(NSTitlebarSeparatorView)
