@@ -38,13 +38,13 @@ hook(_NSTitlebarDecorationView)
     return ZKOrig(NSWindow*);
 }
 
+// Restore original behaviour - drawn UNLESS the titlebar is transparent
+- (void)setDrawsBottomSeparator:(BOOL)shouldDraw {
+    return ZKOrig(void, ![[self window] titlebarAppearsTransparent]);
+}
+
 // This brings back the old bottom separator - we just have to eliminate the "new" separator style elsewhere, in NSWindow
 - (void)_updateBottomSeparatorLayer {
-    // Force separator to render for toolbars
-    if ([[[self window] toolbar] isVisible] && ![[self window] titlebarAppearsTransparent]) {
-        [self setValue:([NSNumber numberWithBool:YES]) forKey:@"drawsBottomSeparator"];
-    }
-    
     // Just returning here brings it back for most window frame designs...
     return;
 }
