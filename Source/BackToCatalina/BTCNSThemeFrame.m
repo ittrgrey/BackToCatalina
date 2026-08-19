@@ -39,10 +39,14 @@ hook(NSThemeFrame)
 
 - (double)_distanceFromToolbarBaseToTitlebar {
     if ([[[self window] toolbar] isVisible] ){
-        if([[self window] titleVisibility] == NSWindowTitleVisible)
-            return ZKOrig(double) + 4.0;
-        else
+        if([[self window] titleVisibility] == NSWindowTitleVisible) {
+            if ([[self window] tabbedWindows]) {
+                return ZKOrig(double) + 4.0;
+            }
+            return ZKOrig(double) + 5.0;
+        } else {
             return ZKOrig(double) - 1.0;
+        }
     }
     else {
         return ZKOrig(double);
