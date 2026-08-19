@@ -229,8 +229,8 @@ hook(TabBarView)
     // Why this isn't standardised with the wider OS impl is beyond me and I'm surprised Apple have never taken the time to eliminate this oddity; does Safari really need these custom controls that look exactly the same as the standard ones?
     // Anyway...
     
-    // Set intended height (25pt for Catalina, 28pt for Big Sur)
-    tabFrame.size.height = 25;
+    // Set intended height (26pt for Catalina, 28pt for Big Sur)
+    tabFrame.size.height = 26;
     
     // Return the modified tab frame itself
     return tabFrame;

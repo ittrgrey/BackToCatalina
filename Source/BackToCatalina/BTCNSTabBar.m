@@ -23,7 +23,7 @@ hook(NSTabBar)
     CGRect containerFrame = tabContainer.frame;
     CGRect containerBounds = tabContainer.bounds;
     
-    // Set intended height (25pt for Catalina, 28pt for Big Sur)
+    // Set intended height (26pt for Catalina, 28pt for Big Sur)
     tabFrame.size.height = containerFrame.size.height = containerBounds.size.height = tabBounds.size.height = 26;
     
     // Reassign the container frame and bounds because the properties of each are read-only...
