@@ -69,6 +69,13 @@ hook(NSThemeFrame)
     return ZKOrig(double) + 2.0;
 }
 
+- (CGRect)_maxTitlebarTitleRect {
+    CGRect frame = ZKOrig(CGRect);
+    
+    frame.size.height -= 2;
+    return frame;
+}
+
 // TODO: Investigate minx and maxx titlebarwidgetinset for goldengate position fixing
 
 endhook
