@@ -269,3 +269,21 @@ hook(NSImage)
     return _orig(id, symbolName, catalog, variableValue, accessibilityDescription, createdWithCompatibilityImageName);
 }
 endhook
+
+hook(NSImageCell)
+
+- (void)_setSidebarTintConfiguration:(NSTintConfiguration*)tintConfiguration {
+    // Restore legacy behaviour for sidebar tinting...
+    return ZKOrig(void, [NSTintConfiguration monochromeTintConfiguration]);
+}
+
+endhook
+
+hook(NSImageView)
+
+- (void)_setSidebarTintConfiguration:(NSTintConfiguration*)tintConfiguration {
+    // Restore legacy behaviour for sidebar tinting...
+    return ZKOrig(void, [NSTintConfiguration monochromeTintConfiguration]);
+}
+
+endhook
