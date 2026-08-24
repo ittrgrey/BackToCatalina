@@ -273,8 +273,12 @@ endhook
 hook(NSImageCell)
 
 - (void)_setSidebarTintConfiguration:(NSTintConfiguration*)tintConfiguration {
-    // Restore legacy behaviour for sidebar tinting...
-    return ZKOrig(void, [NSTintConfiguration monochromeTintConfiguration]);
+    if (tintConfiguration == [NSTintConfiguration defaultTintConfiguration]) {
+        // Restore legacy behaviour for sidebar tinting...
+        tintConfiguration = [NSTintConfiguration monochromeTintConfiguration];
+    }
+    
+    return ZKOrig(void, tintConfiguration);
 }
 
 endhook
@@ -282,8 +286,21 @@ endhook
 hook(NSImageView)
 
 - (void)_setSidebarTintConfiguration:(NSTintConfiguration*)tintConfiguration {
-    // Restore legacy behaviour for sidebar tinting...
-    return ZKOrig(void, [NSTintConfiguration monochromeTintConfiguration]);
+    if (tintConfiguration == [NSTintConfiguration defaultTintConfiguration]) {
+        // Restore legacy behaviour for sidebar tinting...
+        tintConfiguration = [NSTintConfiguration monochromeTintConfiguration];
+    }
+    
+    return ZKOrig(void, tintConfiguration);
+}
+
+endhook
+
+hook(BMAppleIntelligenceAvailability)
+
+
+- (bool)isAppleIntelligenceToggleEnabled {
+    return NO;
 }
 
 endhook
