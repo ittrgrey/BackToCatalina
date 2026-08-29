@@ -295,12 +295,3 @@ hook(NSImageView)
 }
 
 endhook
-
-hook(BMAppleIntelligenceAvailability)
-
-
-- (bool)isAppleIntelligenceToggleEnabled {
-    return NO;
-}
-
-endhook
