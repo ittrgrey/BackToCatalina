@@ -20,7 +20,6 @@ hook(NSSegmentItemView)
 
 endhook
 
-
 hook(NSSegmentedCell)
 
 - (BOOL)_shouldUseSlidingSegmentedControl {

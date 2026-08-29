@@ -138,68 +138,6 @@ static const NSDictionary *appSymbolMaps = @{
         @"slider.horizontal.3": @"sf_tb_style_adjust",
         @"printer": @"sf_tb_misc_print",
     },
-    @"com.apple.finder": @{
-        @"clock": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarRecents.icns",
-        @"appstore": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarApplicationsFolder.icns",
-        @"menubar.dock.rectangle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDesktopFolder.icns",
-        @"doc": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns",
-        @"arrow.down.circle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDownloadsFolder.icns",
-        @"film": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMoviesFolder.icns",
-        @"music": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMusicFolder.icns",
-        @"camera": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPicturesFolder.icns",
-        @"house": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarHomeFolder.icns",
-        @"icloud": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariCloud.icns",
-        @"display": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDisplay.icns",
-        @"desktopcomputer": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariMac.icns",
-        @"macmini": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacMini.icns",
-        @"macmini.gen2": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacMini.icns",
-        @"macmini.gen3": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacMini.icns",
-        @"macmini.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacMini.icns",
-        @"macmini.gen2.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacMini.icns",
-        @"macmini.gen3.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacMini.icns",
-        @"macpro.gen1": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacPro.icns",
-        @"macpro.gen2": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacProCylinder.icns",
-        @"macpro.gen3": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacPro.icns",
-        @"macpro.gen3.server": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacPro.icns",
-        @"macpro.gen1.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacPro.icns",
-        @"macpro.gen2.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacProCylinder.icns",
-        @"macpro.gen3.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacPro.icns",
-        @"macpro.gen3.server.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMacPro.icns",
-        @"xserve": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarXserve.icns",
-        @"xserve.raid": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarXserve.icns",
-        @"iphone": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPhone.icns",
-        @"iphone.gen1": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPhone.icns",
-        @"iphone.gen2": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPhone.icns",
-        @"iphone.gen3": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPhone.icns",
-        @"ipod.touch": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPodTouch.icns",
-        @"ipad": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPad.icns",
-        @"ipad.landscape": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPad.icns",
-        @"ipad.gen1": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPad.icns",
-        @"ipad.gen1.landscape": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPad.icns",
-        @"ipad.gen2": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPad.icns",
-        @"ipad.gen2.landscape": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariPad.icns",
-        @"laptopcomputer": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarLaptop.icns",
-        @"macbook": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarLaptop.icns",
-        @"macbook.gen1": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarLaptop.icns",
-        @"macbook.gen2": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarLaptop.icns",
-        @"internaldrive": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarInternalDisk.icns",
-        @"externaldrive": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarExternalDisk.icns",
-        @"externaldrive.connected.to.line.below": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarServerDrive.icns",
-        @"opticaldisc": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarOpticalDisk.icns",
-        @"bonjour": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarBonjour.icns",
-        @"pc": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPC.icns",
-        @"building.columns.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarGenericFolder.icns",
-        @"folder": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarGenericFolder.icns",
-        @"hammer": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarGenericFolder.icns",
-        @"figure.walk.diamond": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarGenericFolder.icns",
-        @"network": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarNetwork.icns",
-        @"wrench.and.screwdriver.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarUtilitiesFolder.icns",
-#if 0
-        @"airdrop": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarAirDrop.icns", // Conflicts with toolbar
-        @"gearshape": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarSmartFolder.icns", // Conflicts with Settings window
-        @"burn": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarBurnFolder.icns", // Conflicts with toolbar
-#endif
-    },
     @"com.apple.Music": @{
         @"home": @"com.apple.Music.sidebar_ForYouMedium_Normal",
         @"square.grid.2x2": @"com.apple.Music.sidebar_BrowseMedium_Normal",
@@ -248,17 +186,13 @@ hook(NSImage)
     NSString *bundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
     bundleIdentifier = appBundleIdentifierMaps[bundleIdentifier] ?: bundleIdentifier;
     NSDictionary *symbolMap = appSymbolMaps[bundleIdentifier];
-    BOOL isFinder = [bundleIdentifier isEqualToString:@"com.apple.finder"];
     BOOL isMusic = [bundleIdentifier isEqualToString:@"com.apple.Music"];
     if (symbolMap) {
         NSString *assetName = symbolMap[symbolName];
         if (assetName.length) {
             // For iWork apps only for now. This depends on the asset still being present in the current app bundle.
             NSImage *image;
-            if (isFinder) {
-                image = [[NSImage alloc] initWithContentsOfFile:assetName];
-                image.template = YES;
-            } else if (isMusic && carBundle) {
+            if (isMusic && carBundle) {
                 image = [carBundle imageForResource:assetName];
             } else {
                 image = [NSBundle.mainBundle imageForResource:assetName];
