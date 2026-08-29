@@ -14,6 +14,10 @@
         @"NSToolbarCloudSharingItemUseSymbolImages": @NO,
         @"NSAlertMetricsGatheringEnabled": @NO, // Only effective on macOS 11 and 12 - see BTCNSAlert.m for macOS 13 and later
         
+        // Revert some Big Sur-era addons
+        @"NSStatusItemSpacing": @4.0,
+        @"NSStatusItemSelectionPadding": @0.0,
+        
         // Mitigate later Tahoe updates, plus GoldenGate
         @"NSConvolutionOverride1": @5.0,
         @"NSConvolutionOverride2": @5.0,
