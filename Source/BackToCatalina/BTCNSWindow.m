@@ -66,10 +66,6 @@ hook(NSWindow)
     return NSTitlebarSeparatorStyleNone;
 }
 
-- (BOOL)_sidebarSitsBelowToolbar {
-    return YES;
-}
-
 endhook
 
 hook(NSSheetMoveHelper)
