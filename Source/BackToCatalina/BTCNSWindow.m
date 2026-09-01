@@ -56,6 +56,16 @@ hook(NSWindow)
     return [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.systempreferences"] ? 1 : ZKOrig(long long);
 }
 
+// Revert (most) preference windows to being left-aligned
+- (NSWindowToolbarStyle)toolbarStyle {
+    return NSWindowToolbarStyleUnified;
+}
+
+// Apply for some other cases too
+- (void)setToolbarStyle:(NSWindowToolbarStyle)toolbarStyle {
+    return ZKOrig(void, NSWindowToolbarStyleUnified);
+}
+
 // Get rid of the new translucent separator for standard titlebars
 - (NSTitlebarSeparatorStyle)titlebarSeparatorStyle {
     return NSTitlebarSeparatorStyleNone;
