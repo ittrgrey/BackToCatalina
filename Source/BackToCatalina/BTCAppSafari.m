@@ -29,7 +29,7 @@ hook(UnifiedField)
     return isTahoeOrLater ? 26 : 23;
 }
 - (CGFloat)_urlFieldHeight {
-    return 23;
+    return [self _urlTextHeight];
 }
 - (CGFloat)_progressBarCornerRadius {
     NSUInteger browsingMode = ZKHookIvar(self, NSUInteger, "_browsingMode");
