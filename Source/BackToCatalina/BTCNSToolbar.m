@@ -43,23 +43,33 @@ hook(_NSToolbarItemViewerLabelCell)
 endhook
 
 hook(NSToolbarItemViewer)
+
 - (instancetype)initWithItem:(NSToolbarItem *)item forToolbarView:(id)view {
     NSToolbarItemViewer *viewer = _orig(NSToolbarItemViewer *, item, view);
     viewer.clipsToBounds = NO;
     return self;
 }
 
--(void)configureForLayoutInDisplayMode:(NSUInteger)arg0 andSizeMode:(NSUInteger)arg1 inToolbarView:(id)arg2 {
+- (void)configureForLayoutInDisplayMode:(NSUInteger)arg0 andSizeMode:(NSUInteger)arg1 inToolbarView:(id)arg2 {
     NSToolbarItem *item = ZKHookIvar(self, NSToolbarItem *, "_item");
     // Unclip Xcode run/stop button and Safari sidebar button
     item._view.clipsToBounds = NO;
     _orig(void, arg0, arg1, arg2);
 }
 
--(BOOL)_usesRegularSelectionWidgetSize {
+- (BOOL)_usesRegularSelectionWidgetSize {
     // Fix all pref window tabs being shaded
     return NO;
 }
+
+- (CGSize)maxSize {
+    return [[[[(NSView*)self subviews] firstObject] className] isEqualToString:@"NSSeparatorToolbarItemView"] ? CGSizeZero : ZKOrig(CGSize);
+}
+
+- (CGSize)minSize {
+    return [[[[(NSView*)self subviews] firstObject] className] isEqualToString:@"NSSeparatorToolbarItemView"] ? CGSizeZero : ZKOrig(CGSize);
+}
+
 endhook
 
 hook(NSToolbarItemGroupLayoutWrapper)
@@ -102,19 +112,34 @@ hook(NSToolbarView)
 #endif
 endhook
 
-#if 0
-hook(NSTrackingSeparatorToolbarItem)
-- (instancetype)initWithItemIdentifier:(NSToolbarItemIdentifier)identifier {
-    self = _super(id, identifier);
-    return self;
-}
-endhook
-#endif
-
 hook(NSToolbarLabel)
 - (instancetype)init {
     NSToolbarLabel *orig = _orig(id);
     orig.textColor = NSColor.labelColor;
     return self;
 }
+endhook
+
+hook(NSToolbarItem)
+
+- (id)_partitionAdapter {
+    return nil;
+}
+
+endhook
+
+hook(NSTrackingSeparatorToolbarItem)
+
+- (BOOL)_isPartitionItem {
+    return NO;
+}
+
+endhook
+
+hook(NSSeparatorToolbarItemView)
+
+- (BOOL)isHidden {
+    return YES;
+}
+
 endhook
