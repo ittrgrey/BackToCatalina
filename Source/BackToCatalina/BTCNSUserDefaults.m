@@ -5,7 +5,9 @@
 
 @implementation NSObject (BTC)
 + (void)load {
+#ifdef DEBUG
     NSLog(@"=== BTC Loaded === ");
+#endif
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{
         @"NSToolbarItemViewerSupportsSelectionRollover": @NO,
         @"NSToolbarCompatibilityExpansionMetrics": @YES,

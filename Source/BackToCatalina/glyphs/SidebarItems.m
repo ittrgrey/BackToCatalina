@@ -61,7 +61,7 @@ CGRect CalculateSidebarImageFrame(NSView* view, NSImage* image, CGRect frame) {
     
     CGPoint center = CGPointMake((buttonBox.size.width / 2) - (desiredSquare / 2), (buttonBox.size.height / 2) - (desiredSquare / 2));
     
-    // Return the new centered square box (well, offset by 1 to account for a single point difference...)
+    // Return the new centered square box
     return CGRectMake(center.x, center.y, desiredSquare, desiredSquare);
 }
 
