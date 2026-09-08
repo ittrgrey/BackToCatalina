@@ -73,13 +73,14 @@ hook(NSToolbarItemViewer)
 - (BOOL)wantsToBeCentered {
     NSString* bundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
     
-    if (([bundleIdentifier isEqualToString:@"com.apple.Safari"] && [[[(NSView*)self window] frameAutosaveName] isEqualToString:@"Preferences"])
+    if ((([bundleIdentifier isEqualToString:@"com.apple.Safari"]
+        || [bundleIdentifier isEqualToString:@"com.apple.Photos"])
+         && [[[(NSView*)self window] frameAutosaveName] isEqualToString:@"Preferences"]) // These two need extra to ensure correct behaviour in non-prefs windows
         || [bundleIdentifier isEqualToString:@"com.apple.AddressBook"]
         || [bundleIdentifier isEqualToString:@"com.apple.iBooksX"]
         || [bundleIdentifier isEqualToString:@"com.apple.mail"]
         || [bundleIdentifier isEqualToString:@"com.apple.Maps"]
         || [bundleIdentifier isEqualToString:@"com.apple.MobileSMS"]
-        || [bundleIdentifier isEqualToString:@"com.apple.Photos"]
         || [bundleIdentifier isEqualToString:@"com.apple.shortcuts"]) {
         return NO;
     }
