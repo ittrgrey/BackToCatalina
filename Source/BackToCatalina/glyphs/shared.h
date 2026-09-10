@@ -8,7 +8,7 @@
 #include "../BackToCatalina.h"
 #include "../ZKSwizzle.h"
 
-@interface NSWindow (ToolbarViewRef)
+@interface NSWindow (GlyphRef)
 - (id)_toolbarView;
 @end
 
@@ -53,6 +53,88 @@ static const NSDictionary* toolbarGlyphMap = @{
     @"clock": @"ToolbarHistory.pdf",
     @"plus.circle": @"plusEnclosed.pdf",
     @"speaker.wave.2.fill": @"SpeakerWithSoundStroke.pdf",
+};
+
+static const NSDictionary* prefsGlyphMap = @{
+    // General
+    @"gearshape": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/General.icns",
+    @"slider.horizontal.3": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/General.icns",
+    @"sidebar.left": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPrefs.icns",
+    @"sidebar.leading": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPrefs.icns",
+    @"tag": @"PrefToolbarTagsIcon_32",
+    @"gearshape.2": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarAdvanced.icns",
+    @"wrench.and.screwdriver": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarCustomizeIcon.icns",
+    @"at": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Accounts.icns",
+    @"folder": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericFolderIcon.icns",
+    @"bell": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Actions.icns",
+    @"info.circle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns",
+    @"info.circle.fill": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarInfo.icns",
+    
+    // Safari
+    @"lock": @"SecurityPreferences",
+    @"square.on.square": @"TabsPreferences",
+    @"puzzlepiece.extension": @"ExtensionsPreferences",
+    @"key": @"PasswordsPreferences",
+    @"hand.raised": @"PrivacyPreferences",
+    @"rectangle.and.pencil.and.ellipsis": @"AutoFillPreferencesNew",
+    @"magnifyingglass": @"SearchPreferencesNew",
+    @"globe": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/BookmarkIcon.icns", // overlaps with Terminal
+    @"person": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/VCard.icns",
+    @"person.crop.square.filled.and.at.rectangle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/VCard.icns",
+    @"flag.and.flag.filled.crossed": @"BugIcon_NonFinalArt", // Not sure on this one myself...
+    
+    // Playback (shared across a few applications)
+    @"play.circle": @"PreferencesPlaybackButton",
+    
+    // Mail
+    @"xmark.bin": @"junkmail",
+    @"textformat": @"FontsAndColorPreferences",
+    @"eyeglasses": @"ViewerPreferences",
+    @"square.and.pencil": @"ComposingPreferences",
+    @"signature": @"SignaturePreferences",
+    @"envelope.arrow.triangle.branch": @"RulesPreferences",
+    @"envelope.and.arrow.trianglehead.branch": @"RulesPreferences",
+    
+    // Contacts
+    @"square.and.at.rectangle": @"ABTemplatePreferencesModule",
+    @"person.crop.square.fill.and.at.rectangle": @"ABVCardPreferencesModule",
+    
+    // Books
+    @"icloud": @"iCloud",
+    @"book": @"iBooksAppIcon", // Not anatomically correct, but I'm not sure what else would be appropriate
+    
+    // Preview
+    @"photo.on.rectangle": @"TB_PrefsImages",
+    @"text.document": @"TB_PrefsPDF",
+    
+    // ColorSync Utility
+    @"cross.circle": @"FirstAid",
+    @"doc.badge.gearshape": @"Profiles",
+    @"display": @"Devices",
+    @"camera.filters": @"Filters",
+    @"calculator": @"Calculator",
+    
+    // Grapher
+    @"number": @"NumberPreferences",
+    @"sum": @"EquationPreferences",
+    
+    // Script Editor
+    @"pencil": @"SEEditingPreferences",
+    @"clock": @"SEHistoryPreferences",
+    
+    // Audio MIDI Setup
+    @"hifispeaker.2": @"SpeakerIcon",
+    
+    // Terminal
+    @"rectangle.3.offgrid": @"TTPreferencesWindowGroups",
+};
+
+// Resolve app-specific overlaps
+static const NSDictionary* applicationPrefsGlyphMap = @{
+    @"com.apple.Terminal": @{
+        @"doc.badge.gearshape": @"TTPreferencesProfiles",
+        @"globe": @"TTPreferencesEncodings",
+    }
 };
 
 static const NSDictionary* sidebarGlyphMap = @{
