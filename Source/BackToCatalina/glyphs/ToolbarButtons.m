@@ -9,6 +9,12 @@
 #include "../ZKSwizzle.h"
 
 NSImage* FindLegacyToolbarGlyph(NSString* symbolName, BOOL isPrefsWnd) {
+    static NSMutableDictionary<NSString*, NSImage*>* cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{ cache = [NSMutableDictionary dictionary]; });
+    NSString* cacheKey = [NSString stringWithFormat:@"%@|%d", symbolName, isPrefsWnd];
+    if (cache[cacheKey]) return cache[cacheKey];
+
     if (carBundle) {
         // We can humbly assume that if our appearance bundle exists, its contents also do
         NSString* legacyGlyphName = nil;
@@ -40,6 +46,7 @@ NSImage* FindLegacyToolbarGlyph(NSString* symbolName, BOOL isPrefsWnd) {
                 [image setTemplate:NO]; // Likely NOT a template image...
             }
             
+            cache[cacheKey] = image;
             return image;
         }
     }
@@ -48,9 +55,9 @@ NSImage* FindLegacyToolbarGlyph(NSString* symbolName, BOOL isPrefsWnd) {
 }
 
 NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
-    // We check that we're inside a toolbar view before calculating and applying our override - we don't want to replace stuff unintentionally, or do unnecessary calculations here
     BOOL isToolbar = ([[[view window] className] isEqualToString:@"NSToolbarFullScreenWindow"] || [view isDescendantOf:[[view window] _toolbarView]]);
     
+    // We check that we're inside a toolbar view before calculating and applying our override - we don't want to replace stuff unintentionally, or do unnecessary calculations here
     if (!isToolbar) {
         return symbol;
     }
@@ -62,7 +69,7 @@ NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
         }
     }
     
-    NSString* identifier = [[[[symbol representations] firstObject] valueForKey:@"_vectorGlyph"] valueForKey:@"_name"];
+    NSString* identifier = GetSymbolName(symbol);
     NSImage* glyph = FindLegacyToolbarGlyph(identifier, isPrefsWnd);
     
     // Depending on whether it exists, return either our glyph, or the SF Symbol
@@ -93,7 +100,7 @@ CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame) {
     
     CGPoint center = CGPointMake((buttonBox.size.width / 2) - (widthForCalc / 2), floor((buttonBox.size.height / 2) - (heightForCalc / 2)));
     
-    if ([superview.className containsString:@"PopUp"] || [superview.className containsString:@"PullDown"]) {
+    if (([superview.className containsString:@"PopUp"] || [superview.className containsString:@"PullDown"]) && [superview respondsToSelector:@selector(arrowPosition)]) {
         // calling valueForKey does not work here so we have to cast to the relevant class to check arrowPosition attribute
         NSPopUpButtonCell* button = (NSPopUpButtonCell*)superview;
         

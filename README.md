@@ -1,6 +1,6 @@
 # BackToCatalina Beta
 
-Restores macOS Catalina UI on newer versions of macOS. Works on both Apple silicon and Intel running macOS Tahoe, macOS Sequoia, macOS Sonoma and macOS Ventura. Support for macOS Golden Gate is heavily experimental. Featured on [MacGeneration](https://www.macg.co/macos/2026/01/backtocatalina-propose-de-revenir-linterface-de-macos-1015-sur-les-mac-recents-306269) and [MacTechNews](https://www.mactechnews.de/news/article/BackToCatalina-Benutzeroberflaeche-von-macOS-10-15-mit-modernen-macOS-Varianten-nutzen-188707.html). Contributions are welcome!
+Restores macOS Catalina UI on newer versions of macOS. Works on both Apple silicon and Intel running macOS Golden Gate, macOS Tahoe, macOS Sequoia, macOS Sonoma and macOS Ventura. Featured on [MacGeneration](https://www.macg.co/macos/2026/01/backtocatalina-propose-de-revenir-linterface-de-macos-1015-sur-les-mac-recents-306269) and [MacTechNews](https://www.mactechnews.de/news/article/BackToCatalina-Benutzeroberflaeche-von-macOS-10-15-mit-modernen-macOS-Varianten-nutzen-188707.html). Contributions are welcome!
 
 ![BackToCatalina](Source/Screenshots/Screenshot.png)
 
@@ -9,13 +9,7 @@ Restores macOS Catalina UI on newer versions of macOS. Works on both Apple silic
 1. [Disable System Integrity Protection](https://developer.apple.com/documentation/security/disabling-and-enabling-system-integrity-protection) by running `csrutil disable` in macOS Recovery
 1. Install [ammonia](https://github.com/CoreBedtime/ammonia?tab=readme-ov-file#quick-install)
 1. Install [BackToCatalina.pkg](https://raw.githubusercontent.com/nfzerox/BackToCatalina/refs/heads/main/BackToCatalina.pkg) and reboot
-
-Installing BackToCatalina Beta on macOS Tahoe causes Dock, Control Center, and Notification Center to appear without any background material. To fix this, install [launchbad-revived](https://github.com/nfzerox/launchbad-revived).
-
-To get full-width sidebar selection highlight, open Terminal and run:
-```
-defaults write -g NSSidebarUsesGoldenMetrics -bool false
-```
+1. To get the Catalina Dock and Launchpad on macOS Golden Gate and macOS Tahoe, install [launchbad-revived](https://github.com/nfzerox/launchbad-revived)
 
 If an app has compatibility issues with BackToCatalina, add the executable name to the end of `/private/var/ammonia/core/tweaks/libBackToCatalina.dylib.blacklist`
 

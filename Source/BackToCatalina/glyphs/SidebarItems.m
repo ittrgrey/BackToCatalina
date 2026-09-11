@@ -9,15 +9,21 @@
 #include "../ZKSwizzle.h"
 
 NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
+    static NSMutableDictionary<NSString*, NSImage*>* cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{ cache = [NSMutableDictionary dictionary]; });
+    if (cache[symbolName]) return cache[symbolName];
+
     if (carBundle) {
         // We can humbly assume that if our appearance bundle exists, its contents also do
-        NSString* legacyGlyphName = sidebarGlyphMap[symbolName];
+        NSString* legacyGlyphName = finderSidebarGlyphMap[symbolName] ?: sidebarGlyphMap[symbolName];
         if (legacyGlyphName) {
             if ([legacyGlyphName containsString:@"/"]) {
                 // path likely already included
                 NSImage* image = [[NSImage alloc] initWithContentsOfFile:legacyGlyphName];
                 [image setTemplate:YES];
                 
+                cache[symbolName] = image;
                 return image;
             } else if (legacyGlyphName) {
                 // Do the same as we do for toolbar glyphs
@@ -27,6 +33,7 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
                 NSImage* image = [[NSImage alloc] initWithContentsOfFile:path];
                 [image setTemplate:YES];
                 
+                cache[symbolName] = image;
                 return image;
                 
             }
@@ -36,8 +43,23 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
     return NULL;
 }
 
+BOOL IsInsideSidebarStyleList(NSView* view) {
+    NSView* v = view;
+    while (v) {
+        if ([v isKindOfClass:[NSTableView class]]) {
+            return ((NSTableView*)v).selectionHighlightStyle == NSTableViewSelectionHighlightStyleSourceList;
+        }
+        v = v.superview;
+    }
+    return NO;
+}
+
 NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
-    NSString* identifier = [symbol valueForKey:@"_symbolName"];
+    if (!IsInsideSidebarStyleList(view)) {
+        return symbol;
+    }
+
+    NSString* identifier = GetSymbolName(symbol);
     NSImage* glyph = FindLegacySidebarGlyph(identifier);
     
     // Depending on whether it exists, return either our glyph, or the SF Symbol

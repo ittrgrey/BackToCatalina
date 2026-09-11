@@ -5,20 +5,8 @@
 
 NSBundle* carBundle;
 BOOL isTahoeOrLater;
-
-// Disable Solarium by fusing it to be disabled..
-// ..unless we are ControlCenter or NotificationCenterUI
-Boolean (*_os_feature_enabled_impl)(const char* domain, const char* feature);
-Boolean BTC_os_feature_enabled_impl(const char* domain, const char* feature) {
-    Boolean result = _os_feature_enabled_impl(domain, feature);
-    if (domain && feature) {
-         if (strcmp(domain, "SwiftUI") == 0 && strcmp(feature, "Solarium") == 0) {
-             return ([[[NSBundle mainBundle] bundleIdentifier] isEqualToString:@"com.apple.notificationcenterui"] || [[[NSBundle mainBundle] bundleIdentifier] isEqualToString:@"com.apple.controlcenter"]) ? true : false;
-         }
-    }
-    
-    return result;
-}
+BOOL isGoldenGateOrLater;
+BOOL isSafari27OrLater;
 
 Boolean (*CompatWidgetOld)(void);
 Boolean CompatWidgetNew(void) {
@@ -36,6 +24,12 @@ NSOperatingSystemVersion tahoeVersion = {
     .patchVersion = 0
 };
 
+NSOperatingSystemVersion goldenGateVersion = {
+    .majorVersion = 27,
+    .minorVersion = 0,
+    .patchVersion = 0
+};
+
 WEAK_IMPORT_ATTRIBUTE
 @interface load : NSObject @end
 
@@ -47,9 +41,15 @@ WEAK_IMPORT_ATTRIBUTE
     
     // Check if we are on Tahoe or later
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
+    isGoldenGateOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:goldenGateVersion];
     
-    // Disable Solarium by hooking an exported function system-wide, as a fallback and additional layer to ensure it is disabled
-    //DobbyHook(DobbySymbolResolver(NULL, "_os_feature_enabled_impl"), BTC_os_feature_enabled_impl, &_os_feature_enabled_impl);
+    NSString *versionString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    if (versionString) {
+        NSComparisonResult result = [versionString compare:@"27.0" options:NSNumericSearch];
+        if (result != NSOrderedAscending) {
+            isSafari27OrLater = YES;
+        }
+    }
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
               CompatWidgetNew,

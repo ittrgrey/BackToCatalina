@@ -69,7 +69,7 @@ cat > "$SCRIPTS_DIR/postinstall" <<'EOF'
 launchctl setenv FEATUREFLAGS_DISABLED SwiftUI/Solarium
 
 mkdir -p /Library/Preferences/FeatureFlags/Domain
-defaults write /Library/Preferences/FeatureFlags/Domain/SwiftUI.plist Solarium -dict Enabled -bool false
+defaults delete /Library/Preferences/FeatureFlags/Domain/SwiftUI.plist Solarium
 
 CURRENT_ARGS=$(nvram boot-args 2>/dev/null | sed 's/boot-args[[:space:]]*//')
 if [[ "$CURRENT_ARGS" != *"-arm64e_preview_abi"* ]]; then

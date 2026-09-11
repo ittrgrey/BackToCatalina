@@ -68,7 +68,7 @@ static CGRect CatalinaDock_SetFrame(CGRect frame) {
 }
 
 /// Tahoe - Legacy Dock
-hook(_TtC8DockCore16LegacyFloorLayer)
+hook(_TtC8DockCore16LegacyFloorLayer, BTCDock)
 
 - (void)layoutSublayers {
     ZKOrig(void);
@@ -83,7 +83,7 @@ hook(_TtC8DockCore16LegacyFloorLayer)
 endhook
 
 /// Big Sur through Sequoia - Dock
-hook(FloorLayer)
+hook(FloorLayer, BTCDock)
 
 - (void)layoutSublayers {
     ZKOrig(void);

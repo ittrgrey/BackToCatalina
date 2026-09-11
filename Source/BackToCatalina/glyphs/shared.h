@@ -12,9 +12,18 @@
 - (id)_toolbarView;
 @end
 
-@interface NSImage (GlyphRef)
-- (BOOL)_isSymbolImage;
-@end
+static inline NSString* GetSymbolName(NSImage* symbol) {
+    if ([symbol respondsToSelector:@selector(_symbolName)]) {
+        return [symbol valueForKey:@"_symbolName"];
+    }
+    if ([symbol respondsToSelector:NSSelectorFromString(@"_reps")]) {
+        id reps = [symbol valueForKey:@"_reps"];
+        if ([reps respondsToSelector:NSSelectorFromString(@"symbolName")]) {
+            return [reps valueForKey:@"symbolName"];
+        }
+    }
+    return nil;
+}
 
 static const NSDictionary* toolbarGlyphMap = @{
     @"chevron.backward": @"Backarrow.pdf",
@@ -85,7 +94,7 @@ static const NSDictionary* prefsGlyphMap = @{
     @"globe": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/BookmarkIcon.icns", // overlaps with Terminal
     @"person": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/VCard.icns",
     @"person.crop.square.filled.and.at.rectangle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/VCard.icns",
-    @"flag.and.flag.filled.crossed": @"BugIcon_NonFinalArt", // Not sure on this one myself...
+    @"flag.and.flag.filled.crossed": @"FeatureFlags",
     
     // Playback (shared across a few applications)
     @"play.circle": @"PreferencesPlaybackButton",
@@ -141,16 +150,18 @@ static const NSDictionary* applicationPrefsGlyphMap = @{
     }
 };
 
-static const NSDictionary* sidebarGlyphMap = @{
+static const NSDictionary* finderSidebarGlyphMap = @{
     // Finder
     @"clock": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarRecents.icns",
     @"appstore": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarApplicationsFolder.icns",
     @"menubar.dock.rectangle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDesktopFolder.icns",
     @"doc": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns",
+    @"document": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns",
     @"arrow.down.circle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDownloadsFolder.icns",
     @"film": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMoviesFolder.icns",
     @"music": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMusicFolder.icns",
     @"camera": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPicturesFolder.icns",
+    @"photo": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPicturesFolder.icns",
     @"house": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarHomeFolder.icns",
     @"icloud": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariCloud.icns",
     @"display": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDisplay.icns",
@@ -201,7 +212,9 @@ static const NSDictionary* sidebarGlyphMap = @{
     @"airdrop": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarAirDrop.icns",
     @"gearshape": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarSmartFolder.icns",
     @"burn": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarBurnFolder.icns",
+};
     
+static const NSDictionary* sidebarGlyphMap = @{
     // Below are still disabled due to conflicts with other types
     // TODO - add application-specific overrides here
     // For now we defer to legacy NSImage hooks here, which still take priority
