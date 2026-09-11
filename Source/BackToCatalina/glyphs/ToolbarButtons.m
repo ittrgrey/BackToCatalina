@@ -52,6 +52,11 @@ NSImage* FindLegacyToolbarGlyph(NSString* symbolName, BOOL isPrefsWnd) {
 }
 
 NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
+    // We check that we're inside a toolbar view before calculating and applying our override - we don't want to replace stuff unintentionally, or do unnecessary calculations here
+    if ((![[[view window] className] isEqualToString:@"NSToolbarFullScreenWindow"] && ![view isDescendantOf:[[view window] _toolbarView]])) {
+        return symbol;
+    }
+    
     BOOL isPrefsWnd = NO;
     for (NSView* potentialWidget in view.superview.superview.subviews) {
         if ([[potentialWidget className] isEqualToString:@"NSWidgetView"]) {
@@ -63,8 +68,7 @@ NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
     NSImage* glyph = FindLegacyToolbarGlyph(identifier, isPrefsWnd);
     
     // Depending on whether it exists, return either our glyph, or the SF Symbol
-    // We also check that we're inside a toolbar view before applying our override - we don't want to replace stuff unintentionally
-    return glyph && [view isDescendantOf:[[view window] _toolbarView]] ? glyph : symbol;
+    return glyph ? glyph : symbol;
 }
 
 CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame) {
