@@ -44,12 +44,11 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
 }
 
 BOOL IsInsideSidebarStyleList(NSView* view) {
-    NSView* v = view;
-    while (v) {
-        if ([v isKindOfClass:[NSTableView class]]) {
-            return ((NSTableView*)v).selectionHighlightStyle == NSTableViewSelectionHighlightStyleSourceList;
+    while (view) {
+        if ([view isKindOfClass:[NSTableView class]]) {
+            return ((NSTableView*)view).selectionHighlightStyle == NSTableViewSelectionHighlightStyleSourceList;
         }
-        v = v.superview;
+        view = view.superview;
     }
     return NO;
 }
