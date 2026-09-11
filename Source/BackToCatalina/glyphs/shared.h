@@ -12,6 +12,10 @@
 - (id)_toolbarView;
 @end
 
+@interface NSImage (GlyphRef)
+- (BOOL)_isSymbolImage;
+@end
+
 static inline NSString* GetSymbolName(NSImage* symbol) {
     if ([symbol respondsToSelector:@selector(_symbolName)]) {
         return [symbol valueForKey:@"_symbolName"];
