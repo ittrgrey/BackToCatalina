@@ -62,7 +62,7 @@ NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
         }
     }
     
-    NSString* identifier = [symbol valueForKey:@"_symbolName"];
+    NSString* identifier = [[[[symbol representations] firstObject] valueForKey:@"_vectorGlyph"] valueForKey:@"_name"];
     NSImage* glyph = FindLegacyToolbarGlyph(identifier, isPrefsWnd);
     
     // Depending on whether it exists, return either our glyph, or the SF Symbol
