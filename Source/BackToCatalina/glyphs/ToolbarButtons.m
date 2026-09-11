@@ -138,8 +138,4 @@ hook(NSButtonImageView)
     return 0;
 }
 
-- (void)_configureSymbolLayer {
-    
-}
-
 endhook
