@@ -12,6 +12,10 @@
 - (id)_toolbarView;
 @end
 
+@interface NSImage (GlyphRef)
+- (BOOL)_isSymbolImage;
+@end
+
 static const NSDictionary* toolbarGlyphMap = @{
     @"chevron.backward": @"Backarrow.pdf",
     @"chevron.left": @"Backarrow.pdf", // Different glyphs are used... when it's not a toolbar
