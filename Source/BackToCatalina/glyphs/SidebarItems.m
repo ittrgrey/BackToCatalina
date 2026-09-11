@@ -16,7 +16,7 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
 
     if (carBundle) {
         // We can humbly assume that if our appearance bundle exists, its contents also do
-        NSString* legacyGlyphName = sidebarGlyphMap[symbolName];
+        NSString* legacyGlyphName = finderSidebarGlyphMap[symbolName] ?: sidebarGlyphMap[symbolName];
         if (legacyGlyphName) {
             if ([legacyGlyphName containsString:@"/"]) {
                 // path likely already included
@@ -45,7 +45,22 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
     return NULL;
 }
 
+BOOL IsInsideSidebarStyleList(NSView* view) {
+    NSView* v = view;
+    while (v) {
+        if ([v isKindOfClass:[NSTableView class]]) {
+            return ((NSTableView*)v).selectionHighlightStyle == NSTableViewSelectionHighlightStyleSourceList;
+        }
+        v = v.superview;
+    }
+    return NO;
+}
+
 NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
+    if (!IsInsideSidebarStyleList(view)) {
+        return symbol;
+    }
+
     NSString* identifier = GetSymbolName(symbol);
     NSImage* glyph = FindLegacySidebarGlyph(identifier);
     

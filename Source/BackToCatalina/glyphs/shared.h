@@ -94,7 +94,7 @@ static const NSDictionary* prefsGlyphMap = @{
     @"globe": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/BookmarkIcon.icns", // overlaps with Terminal
     @"person": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/VCard.icns",
     @"person.crop.square.filled.and.at.rectangle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/VCard.icns",
-    @"flag.and.flag.filled.crossed": @"BugIcon_NonFinalArt", // Not sure on this one myself...
+    @"flag.and.flag.filled.crossed": @"FeatureFlags",
     
     // Playback (shared across a few applications)
     @"play.circle": @"PreferencesPlaybackButton",
@@ -150,7 +150,7 @@ static const NSDictionary* applicationPrefsGlyphMap = @{
     }
 };
 
-static const NSDictionary* sidebarGlyphMap = @{
+static const NSDictionary* finderSidebarGlyphMap = @{
     // Finder
     @"clock": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarRecents.icns",
     @"appstore": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarApplicationsFolder.icns",
@@ -212,7 +212,9 @@ static const NSDictionary* sidebarGlyphMap = @{
     @"airdrop": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarAirDrop.icns",
     @"gearshape": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarSmartFolder.icns",
     @"burn": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarBurnFolder.icns",
+};
     
+static const NSDictionary* sidebarGlyphMap = @{
     // Below are still disabled due to conflicts with other types
     // TODO - add application-specific overrides here
     // For now we defer to legacy NSImage hooks here, which still take priority

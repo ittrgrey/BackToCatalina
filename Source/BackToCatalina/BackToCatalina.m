@@ -5,6 +5,7 @@
 
 NSBundle* carBundle;
 BOOL isTahoeOrLater;
+BOOL isGoldenGateOrLater;
 BOOL isSafari27OrLater;
 
 Boolean (*CompatWidgetOld)(void);
@@ -23,6 +24,12 @@ NSOperatingSystemVersion tahoeVersion = {
     .patchVersion = 0
 };
 
+NSOperatingSystemVersion goldenGateVersion = {
+    .majorVersion = 27,
+    .minorVersion = 0,
+    .patchVersion = 0
+};
+
 WEAK_IMPORT_ATTRIBUTE
 @interface load : NSObject @end
 
@@ -34,6 +41,7 @@ WEAK_IMPORT_ATTRIBUTE
     
     // Check if we are on Tahoe or later
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
+    isGoldenGateOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:goldenGateVersion];
     
     NSString *versionString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     if (versionString) {
