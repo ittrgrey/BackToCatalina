@@ -12,6 +12,19 @@
 - (id)_toolbarView;
 @end
 
+static inline NSString* GetSymbolName(NSImage* symbol) {
+    if ([symbol respondsToSelector:@selector(_symbolName)]) {
+        return [symbol valueForKey:@"_symbolName"];
+    }
+    if ([symbol respondsToSelector:NSSelectorFromString(@"_reps")]) {
+        id reps = [symbol valueForKey:@"_reps"];
+        if ([reps respondsToSelector:NSSelectorFromString(@"symbolName")]) {
+            return [reps valueForKey:@"symbolName"];
+        }
+    }
+    return nil;
+}
+
 static const NSDictionary* toolbarGlyphMap = @{
     @"chevron.backward": @"Backarrow.pdf",
     @"chevron.left": @"Backarrow.pdf", // Different glyphs are used... when it's not a toolbar
@@ -143,10 +156,12 @@ static const NSDictionary* sidebarGlyphMap = @{
     @"appstore": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarApplicationsFolder.icns",
     @"menubar.dock.rectangle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDesktopFolder.icns",
     @"doc": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns",
+    @"document": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns",
     @"arrow.down.circle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDownloadsFolder.icns",
     @"film": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMoviesFolder.icns",
     @"music": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarMusicFolder.icns",
     @"camera": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPicturesFolder.icns",
+    @"photo": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarPicturesFolder.icns",
     @"house": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarHomeFolder.icns",
     @"icloud": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebariCloud.icns",
     @"display": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDisplay.icns",

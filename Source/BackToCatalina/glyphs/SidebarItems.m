@@ -9,6 +9,11 @@
 #include "../ZKSwizzle.h"
 
 NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
+    static NSMutableDictionary<NSString*, NSImage*>* cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{ cache = [NSMutableDictionary dictionary]; });
+    if (cache[symbolName]) return cache[symbolName];
+
     if (carBundle) {
         // We can humbly assume that if our appearance bundle exists, its contents also do
         NSString* legacyGlyphName = sidebarGlyphMap[symbolName];
@@ -19,6 +24,7 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
                 [image setTemplate:YES];
                 [image setAccessibilityDescription:legacyGlyphName];
                 
+                cache[symbolName] = image;
                 return image;
             } else if (legacyGlyphName) {
                 // Do the same as we do for toolbar glyphs
@@ -29,6 +35,7 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
                 [image setTemplate:YES];
                 [image setAccessibilityDescription:legacyGlyphName];
                 
+                cache[symbolName] = image;
                 return image;
                 
             }
@@ -39,7 +46,7 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
 }
 
 NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
-    NSString* identifier = [symbol valueForKey:@"_symbolName"];
+    NSString* identifier = GetSymbolName(symbol);
     NSImage* glyph = FindLegacySidebarGlyph(identifier);
     
     // Depending on whether it exists, return either our glyph, or the SF Symbol
