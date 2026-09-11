@@ -8,7 +8,7 @@
 #include "../ZKSwizzle.h"
 #include "shared.h"
 
-hook(DockBar)
+hook(DockBar, BTCDock)
 
 - (float)distanceTop {
     return ZKOrig(float) + 1.0;
