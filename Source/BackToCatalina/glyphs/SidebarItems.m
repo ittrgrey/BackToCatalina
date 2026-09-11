@@ -55,6 +55,7 @@ BOOL IsInsideSidebarStyleList(NSView* view) {
 
 NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
     if (!IsInsideSidebarStyleList(view)) {
+        // Return unmodified image if we aren't a sidebar
         return symbol;
     }
 
