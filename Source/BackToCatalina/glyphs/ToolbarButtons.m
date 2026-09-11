@@ -39,14 +39,10 @@ NSImage* FindLegacyToolbarGlyph(NSString* symbolName, BOOL isPrefsWnd) {
             NSImage* image = [[NSImage alloc] initWithContentsOfFile:path]; // first try
             if (!image) image = [[NSImage alloc] initWithContentsOfFile:legacyGlyphName]; // second try
             [image setTemplate:(!isPrefsWnd ? YES : NO)];
-            [image setAccessibilityDescription:legacyGlyphName];
             
             // third and final attempt -- are we using a PNG resource from our bundle?
             if (!image) {
                 image = [carBundle imageForResource:legacyGlyphName];
-                
-                // So this gets picked up properly as a custom image, we'll set our accessibility description accordingly
-                [image setAccessibilityDescription:@"/LegacyResourceFile"];
                 [image setTemplate:NO]; // Likely NOT a template image...
             }
             
@@ -59,8 +55,10 @@ NSImage* FindLegacyToolbarGlyph(NSString* symbolName, BOOL isPrefsWnd) {
 }
 
 NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
+    BOOL isToolbar = ([[[view window] className] isEqualToString:@"NSToolbarFullScreenWindow"] || [view isDescendantOf:[[view window] _toolbarView]]);
+    
     // We check that we're inside a toolbar view before calculating and applying our override - we don't want to replace stuff unintentionally, or do unnecessary calculations here
-    if ((![[[view window] className] isEqualToString:@"NSToolbarFullScreenWindow"] && ![view isDescendantOf:[[view window] _toolbarView]])) {
+    if (!isToolbar) {
         return symbol;
     }
     
@@ -79,10 +77,11 @@ NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
 }
 
 CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame) {
-    BOOL isCustomImage = [[image accessibilityDescription] containsString:@".pdf"] || [[image accessibilityDescription] containsString:@"/"];
+    BOOL isSymbolImage = [image _isSymbolImage];
+    BOOL isToolbar = ([[[view window] className] isEqualToString:@"NSToolbarFullScreenWindow"] || [view isDescendantOf:[[view window] _toolbarView]]);
     
-    if (!isCustomImage) {
-        // Return unmodified frame if we are still using SF Symbols in this case
+    if (isSymbolImage || !isToolbar) {
+        // Return unmodified frame if we are still using SF Symbols, or are not inside a toolbar
         return frame;
     }
     
@@ -106,7 +105,7 @@ CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame) {
         NSPopUpButtonCell* button = (NSPopUpButtonCell*)superview;
         
         if (button.arrowPosition != NSPopUpNoArrow) {
-            center.x -= buttonBox.size.width / 8;
+            center.x = 9;
         }
     }
     
@@ -144,10 +143,6 @@ hook(NSButtonImageView)
 - (int)_vibrancyBlendMode {
     // Fix prefs window tab icon colorization
     return 0;
-}
-
-- (void)_configureSymbolLayer {
-    
 }
 
 endhook
