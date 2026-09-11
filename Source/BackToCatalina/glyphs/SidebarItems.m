@@ -17,7 +17,6 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
                 // path likely already included
                 NSImage* image = [[NSImage alloc] initWithContentsOfFile:legacyGlyphName];
                 [image setTemplate:YES];
-                [image setAccessibilityDescription:legacyGlyphName];
                 
                 return image;
             } else if (legacyGlyphName) {
@@ -27,7 +26,6 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
             
                 NSImage* image = [[NSImage alloc] initWithContentsOfFile:path];
                 [image setTemplate:YES];
-                [image setAccessibilityDescription:legacyGlyphName];
                 
                 return image;
                 
@@ -47,9 +45,9 @@ NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
 }
 
 CGRect CalculateSidebarImageFrame(NSView* view, NSImage* image, CGRect frame) {
-    BOOL isCustomImage = [[image accessibilityDescription] containsString:@".icns"] || [[image accessibilityDescription] containsString:@"/"];
+    BOOL isSymbolImage = [image _isSymbolImage];
     
-    if (!isCustomImage) {
+    if (isSymbolImage) {
         // Return unmodified frame if we are still using SF Symbols in this case
         return frame;
     }
