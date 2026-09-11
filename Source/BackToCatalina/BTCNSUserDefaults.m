@@ -16,9 +16,12 @@
         @"NSToolbarCloudSharingItemUseSymbolImages": @NO,
         @"NSAlertMetricsGatheringEnabled": @NO, // Only effective on macOS 11 and 12 - see BTCNSAlert.m for macOS 13 and later
         
+#if 0
+        // Disabled because it turns Control Center module selection oval and uneven padding between elements
         // Revert some Big Sur-era addons
         @"NSStatusItemSpacing": @4.0,
         @"NSStatusItemSelectionPadding": @0.0,
+#endif
         
         @"com.apple.SwiftUI.MacUnbridgedSlider": @NO,
         @"com.apple.SwiftUI.MacUnbridgedButtons": @NO,

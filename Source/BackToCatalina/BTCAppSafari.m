@@ -1,13 +1,33 @@
 #include "BackToCatalina.h"
 #include "ZKSwizzle.h"
+#include <objc/runtime.h>
 
-@interface UnifiedField : NSTextField @end
+extern void objc_storeStrong(id __unsafe_unretained *location, id value);
 
 @interface CombinedSidebarTabGroupToolbarButton : NSView @end
 
 @interface UnifiedFieldBezelView : NSTextField @end
 
 @interface UnifiedFieldButtonMetrics : NSObject @end
+
+@interface UnifiedField : NSTextField
+@property (weak, nonatomic) UnifiedFieldBezelView *bezelView;
+@end
+
+@interface ToolbarController : NSObject
+- (UnifiedField *)unifiedField;
+@end
+
+@interface NSView (Corner)
+- (CGFloat)_cornerRadius;
+- (void)_setCornerRadius:(CGFloat)cornerRadius;
+@end
+
+hook(WindowControlShadowView)
++ (id)windowControlShadowViewWithWindow:(NSWindow *)wind {
+    return nil;
+}
+endhook
 
 hook(BadgeButton)
 - (BOOL)allowsVibrancy {
@@ -16,6 +36,9 @@ hook(BadgeButton)
 endhook
 
 hook(UnifiedField)
+- (NSSize)_defaultButtonSize {
+    return CGSizeMake(22, 28);
+}
 - (CGFloat)_defaultButtonYOffset {
     return -1;
 }
@@ -31,12 +54,25 @@ hook(UnifiedField)
 - (CGFloat)_urlFieldHeight {
     return [self _urlTextHeight];
 }
+- (CGFloat)_progressBarDrawingOffset {
+    return 0;
+}
+- (CGFloat)marginBeforeFirstComponent {
+    return 7;
+}
 - (CGFloat)_progressBarCornerRadius {
     NSUInteger browsingMode = ZKHookIvar(self, NSUInteger, "_browsingMode");
     if (browsingMode == 1) {
         return 4.5;
     } else {
         return 3.5;
+    }
+}
+- (void)_updateProgressFillCornerRadius {
+    _orig(void);
+    if (isTahoeOrLater) {
+        NSView *progressFillLayerClipView = ZKHookIvar(self, NSView *, "_progressFillLayerClipView");
+        [progressFillLayerClipView _setCornerRadius:[self _progressBarCornerRadius]];
     }
 }
 endhook
@@ -46,6 +82,49 @@ hook(ToolbarController)
     UnifiedField *field = _orig(UnifiedField *, toolbar);
     field.controlSize = NSControlSizeRegular;
     return field;
+}
+
+- (NSView *)unifiedFieldContainerView {
+    if (isTahoeOrLater) {
+        UnifiedFieldBezelView *existingBezelView = ZKHookIvar(self, UnifiedFieldBezelView *, "_unifiedFieldBezelView");
+        if (!existingBezelView) {
+            UnifiedFieldBezelView *bezelView = [[NSClassFromString(@"UnifiedFieldBezelView") alloc] init];
+            bezelView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+            objc_storeStrong((id __unsafe_unretained *)ZKIvarPointer(self, "_unifiedFieldBezelView"), bezelView);
+            UnifiedField *unifiedField = ((ToolbarController *)self).unifiedField;
+            unifiedField.bezelView = bezelView;
+        }
+    }
+    NSView *view = _orig(NSView *);
+    return view;
+}
+endhook
+
+BOOL pendingCellFrameOffsetIncrease = NO;
+
+hook(FavoriteButtonCell)
+- (NSSize)cellSize {
+    NSSize size = _orig(NSSize);
+    if (isTahoeOrLater && ZKHookIvar(self, NSInteger, "_buttonStyle") == 0) {
+        size.width += 8;
+    }
+    return size;
+}
+- (void)drawInteriorWithFrame:(CGRect)frame inView:(NSView *)view {
+    if (isTahoeOrLater) {
+        pendingCellFrameOffsetIncrease = YES;
+    }
+    _orig(void, frame, view);
+    pendingCellFrameOffsetIncrease = NO;
+}
+endhook
+
+hook(RolloverTextButtonCell)
+- (void)drawInteriorWithFrame:(CGRect)frame inView:(NSView *)view {
+    if (pendingCellFrameOffsetIncrease) {
+        frame.origin.y += 1;
+    }
+    _orig(void, frame, view);
 }
 endhook
 
@@ -197,7 +276,7 @@ hook(ToolbarDownloadsButton)
     _orig(void);
     NSView *progressBar = ZKHookIvar(self, NSView *, "_progressBar");
     NSRect frame = progressBar.frame;
-    frame.origin.y = frame.origin.y - 5;
+    frame.origin.y = frame.origin.y - (isTahoeOrLater ? 0 : 5);
     progressBar.frame = frame;
 
 }
@@ -236,4 +315,16 @@ hook(TabBarView)
     return tabFrame;
 }
 
+endhook
+
+hook(WBSFeatureAvailability)
++ (BOOL)isSolariumEnabled {
+    return NO;
+}
+endhook
+
+hook(FeatureAvailability)
++ (BOOL)usesUnifiedTabBarInSeparateLayout {
+    return NO;
+}
 endhook

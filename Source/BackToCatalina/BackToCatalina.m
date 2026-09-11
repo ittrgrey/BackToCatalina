@@ -5,6 +5,7 @@
 
 NSBundle* carBundle;
 BOOL isTahoeOrLater;
+BOOL isSafari27OrLater;
 
 Boolean (*CompatWidgetOld)(void);
 Boolean CompatWidgetNew(void) {
@@ -33,6 +34,14 @@ WEAK_IMPORT_ATTRIBUTE
     
     // Check if we are on Tahoe or later
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
+    
+    NSString *versionString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    if (versionString) {
+        NSComparisonResult result = [versionString compare:@"27.0" options:NSNumericSearch];
+        if (result != NSOrderedAscending) {
+            isSafari27OrLater = YES;
+        }
+    }
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
               CompatWidgetNew,
