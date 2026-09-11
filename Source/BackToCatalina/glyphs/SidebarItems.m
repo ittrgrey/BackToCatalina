@@ -69,7 +69,7 @@ NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
 CGRect CalculateSidebarImageFrame(NSView* view, NSImage* image, CGRect frame) {
     BOOL isSymbolImage = [image _isSymbolImage];
     
-    if (isSymbolImage) {
+    if (isSymbolImage || !IsInsideSidebarStyleList(view)) {
         // Return unmodified frame if we are still using SF Symbols in this case
         return frame;
     }
