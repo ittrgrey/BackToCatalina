@@ -5,8 +5,9 @@
 //  Created by ittrgrey on 07/07/2026.
 //
 
-#import <Cocoa/Cocoa.h>
-#import "dobby.h"
+#include "CommonDef.h"
+#include <Cocoa/Cocoa.h>
+#include "dobby.h"
 #include <time.h>
 
 enum { BTCSolariumDisabled = 0, BTCSolariumCompatibility = 1, BTCSolariumEnabled = 2 };
@@ -60,6 +61,7 @@ static BOOL BTCInstall(const char *image, const char *sym, void *fake, void **or
     return rc == 0;
 }
 
+#ifdef APPLY_BUNDLE
 __attribute__((constructor))
 static void BTCSolariumInit(void) {
     BTCInstall("SwiftUICore",
@@ -79,3 +81,4 @@ static void BTCSolariumInit(void) {
 
     NSLog(@"[BTC] installed for %@", NSProcessInfo.processInfo.processName);
 }
+#endif
