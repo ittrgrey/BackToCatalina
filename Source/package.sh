@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+macos_version=$(sw_vers -productVersion | cut -d '.' -f 1)
+
 PACKAGE_NAME="BackToCatalina.pkg"
 INSTALL_LOCATION="/var/ammonia/core/tweaks"
 STAGING_DIR="${TMPDIR:?}/BackToCatalina-staging"
@@ -69,7 +71,11 @@ cat > "$SCRIPTS_DIR/postinstall" <<'EOF'
 launchctl setenv FEATUREFLAGS_DISABLED SwiftUI/Solarium
 
 mkdir -p /Library/Preferences/FeatureFlags/Domain
-defaults delete /Library/Preferences/FeatureFlags/Domain/SwiftUI.plist Solarium
+if [ "$macos_version" -ge 26 ]; then
+    defaults write /Library/Preferences/FeatureFlags/Domain/SwiftUI.plist Solarium -dict Enabled -bool false
+else
+    defaults delete /Library/Preferences/FeatureFlags/Domain/SwiftUI.plist Solarium
+fi
 
 CURRENT_ARGS=$(nvram boot-args 2>/dev/null | sed 's/boot-args[[:space:]]*//')
 if [[ "$CURRENT_ARGS" != *"-arm64e_preview_abi"* ]]; then

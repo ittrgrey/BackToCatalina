@@ -16,3 +16,12 @@ hook(NSSplitView)
 }
 
 endhook
+
+hook(NSSplitDividerView)
+
+// Pre-Tahoe, the other function wasn't present. This is supplementary to ensure Sequoia and earlier behave ordinarily.
+- (void)setStyle:(long long)style {
+    return ZKOrig(void, 4);
+}
+
+endhook

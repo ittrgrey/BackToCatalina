@@ -44,18 +44,18 @@ NSImage* FindLegacySidebarGlyph(NSString* symbolName) {
 }
 
 BOOL IsInsideSidebarStyleList(NSView* view) {
-    NSView* v = view;
-    while (v) {
-        if ([v isKindOfClass:[NSTableView class]]) {
-            return ((NSTableView*)v).selectionHighlightStyle == NSTableViewSelectionHighlightStyleSourceList;
+    while (view) {
+        if ([view isKindOfClass:[NSTableView class]]) {
+            return ((NSTableView*)view).selectionHighlightStyle == NSTableViewSelectionHighlightStyleSourceList;
         }
-        v = v.superview;
+        view = view.superview;
     }
     return NO;
 }
 
 NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
     if (!IsInsideSidebarStyleList(view)) {
+        // Return unmodified image if we aren't a sidebar
         return symbol;
     }
 
@@ -69,7 +69,7 @@ NSImage* GetSidebarButtonImage(NSView* view, NSImage* symbol) {
 CGRect CalculateSidebarImageFrame(NSView* view, NSImage* image, CGRect frame) {
     BOOL isSymbolImage = [image _isSymbolImage];
     
-    if (isSymbolImage) {
+    if (isSymbolImage || !IsInsideSidebarStyleList(view)) {
         // Return unmodified frame if we are still using SF Symbols in this case
         return frame;
     }
