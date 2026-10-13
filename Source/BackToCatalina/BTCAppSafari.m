@@ -36,30 +36,48 @@ hook(BadgeButton)
 endhook
 
 hook(UnifiedField)
+
 - (NSSize)_defaultButtonSize {
     return CGSizeMake(22, 28);
 }
+
+- (CGFloat)_urlTextYOffset {
+    return -4;
+}
+
 - (CGFloat)_defaultButtonYOffset {
     return -1;
 }
-+ (CGFloat)urlTextYOffset {
-    return -2;
-}
+
 - (CGFloat)_siteIconYOffset {
     return 4;
 }
+
 - (CGFloat)_urlTextHeight {
-    return isTahoeOrLater ? 26 : 23;
+    return 25;
 }
+
 - (CGFloat)_urlFieldHeight {
     return [self _urlTextHeight];
 }
+
+- (void)setFrame:(CGRect)frame {
+    frame.size.height = [self _urlTextHeight];
+    return ZKOrig(void, frame);
+}
+
+- (void)setBezelStyle:(NSTextFieldBezelStyle)style {
+    return ZKOrig(void, NSBezelStyleTexturedRounded);
+}
+
 - (CGFloat)_progressBarDrawingOffset {
     return 0;
 }
+
 - (CGFloat)marginBeforeFirstComponent {
     return 7;
 }
+
 - (CGFloat)_progressBarCornerRadius {
     NSUInteger browsingMode = ZKHookIvar(self, NSUInteger, "_browsingMode");
     if (browsingMode == 1) {
@@ -75,6 +93,7 @@ hook(UnifiedField)
         [progressFillLayerClipView _setCornerRadius:[self _progressBarCornerRadius]];
     }
 }
+
 endhook
 
 hook(ToolbarController)
@@ -217,18 +236,25 @@ static NSImage *_backgroundPrivateWindowFill(void)
 
 hook(UnifiedFieldBezelView)
 - (void)_updateBackingMaterial {
+    return;
 }
 
 - (void)_updateAppearance {
+    return;
 }
 
 - (void)_setLayerBorderWidthIfNeeded:(id)arg {
+    return;
 }
 
 - (void)_finishInitialization {
     UnifiedFieldBezelView *view = (UnifiedFieldBezelView *)self;
     view.editable = NO;
     view.drawsBackground = NO;
+}
+
+- (void)setBezelStyle:(NSTextFieldBezelStyle)style {
+    return ZKOrig(void, NSBezelStyleTexturedRounded);
 }
 
 - (void)_drawDarkPrivateBrowsingBezel
