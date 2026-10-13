@@ -14,6 +14,9 @@ BOOL isWeather;
 BOOL isFinder;
 BOOL isShortcuts;
 
+Boolean (*CompatWidgetOld)(void);
+Boolean (*SelectionRolloverOld)(void);
+
 void BTCInstallToolbarAnimationHooks(void);
 void BTCInstallSidebarFontHook(void);
 
@@ -45,14 +48,12 @@ __attribute__((constructor)) static void BTCInstallAppHooks(void) {
     if (isWeather && isGoldenGateOrLater) ZKSwizzleGroup(BTCWeather);
 }
 
-Boolean (*CompatWidgetOld)(void);
-Boolean CompatWidgetNew(void) {
-    return true;
+Boolean CommonAppKitTrue(void) {
+    return YES;
 }
 
-Boolean (*SelectionRolloverOld)(void);
-Boolean SelectionRolloverNew(void) {
-    return false;
+Boolean CommonAppKitFalse(void) {
+    return NO;
 }
 
 NSOperatingSystemVersion tahoeVersion = {
@@ -75,6 +76,7 @@ WEAK_IMPORT_ATTRIBUTE
 +(void)load {
     // This loads from a bundle that contains the asset files, but otherwise has been renamed etc so that it isn't wiped during system updates
     carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/BTC_VisualStyle.bundle"];
+    //carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/MacOSXArt.bundle"];
     
     // Check if we are on Tahoe or later
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
@@ -95,12 +97,14 @@ WEAK_IMPORT_ATTRIBUTE
     }
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
-              CompatWidgetNew,
+              CommonAppKitTrue(),
               &CompatWidgetOld);
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerSupportsSelectionRolloverDefaultValueFunction"),
-              SelectionRolloverNew,
+              CommonAppKitFalse,
               &SelectionRolloverOld);
+    
+    
 }
 
 @end
