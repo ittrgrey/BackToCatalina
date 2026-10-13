@@ -97,7 +97,7 @@ WEAK_IMPORT_ATTRIBUTE
     }
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
-              CommonAppKitTrue(),
+              CommonAppKitTrue,
               &CompatWidgetOld);
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerSupportsSelectionRolloverDefaultValueFunction"),
