@@ -55,3 +55,12 @@ hook(NSContextMenuImpl)
 }
 
 endhook
+
+hook(NSContextMenuItemView)
+
+- (double)maxTitleWidth {
+    NSLog(@"[TITLEWIDTH] %g", ZKOrig(double));
+    return ZKOrig(double) + 5;
+}
+
+endhook
