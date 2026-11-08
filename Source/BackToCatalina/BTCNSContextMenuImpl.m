@@ -59,7 +59,9 @@ endhook
 hook(NSContextMenuItemView)
 
 - (double)maxTitleWidth {
-    NSLog(@"[TITLEWIDTH] %g", ZKOrig(double));
+    // As of 26.7.2, the bound calculation seems to result in less width being allocated compared to 26.3.1
+    // Currently the workaround is to just increase the bounding box width for text in menus
+    // I'll look at this closer in future...
     return ZKOrig(double) + 5;
 }
 
