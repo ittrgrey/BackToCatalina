@@ -1,7 +1,8 @@
-#import <AppKit/AppKit.h>
-#import <mach-o/dyld.h>
-#import <mach-o/getsect.h>
-#import "ZKSwizzle.h"
+#include <AppKit/AppKit.h>
+#include <mach-o/dyld.h>
+#include <mach-o/getsect.h>
+#include "ZKSwizzle.h"
+#include "CommonDef.h"
 
 ZKSwizzleInterfaceGroup(BTCRemindersMainWindowAppearance, NSWindow, NSObject, BTCReminders)
 @implementation BTCRemindersMainWindowAppearance
@@ -92,3 +93,26 @@ BTC_REMINDERS_METRICS_HOOK(NSAquaAppearance)
 BTC_REMINDERS_METRICS_HOOK(NSDarkAquaAppearance)
 BTC_REMINDERS_METRICS_HOOK(NSVibrantLightAppearance)
 BTC_REMINDERS_METRICS_HOOK(NSVibrantDarkAppearance)
+
+#ifdef APPLY_SYRAH
+// Sequoia and earlier
+hook(EKUIPopUpButtonCell)
+
+- (id)titleAttributes {
+    // Wipe this out so that creating a reminder in Calendar does not cause crashing issues with Helvetica Neue
+    return nil;
+}
+
+endhook
+
+// Tahoe+
+hook(TTRMUIPopUpButtonCell)
+
+- (id)titleAttributes {
+    // Wipe this out so that creating a reminder in Calendar does not cause crashing issues with Helvetica Neue
+    return nil;
+}
+
+endhook
+#endif
+
