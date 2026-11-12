@@ -93,7 +93,15 @@ NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol) {
     return glyph ? glyph : symbol;
 }
 
-CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame) {
+// For when we know that we're in a toolbar without any ambiguity and we don't have or need extra data
+NSImage* SimpleToolbarButtonImage(NSImage* symbol) {
+    NSString *identifier = GetSymbolName(symbol);
+    
+    NSImage* glyph = FindLegacyToolbarGlyph(identifier, NO);
+    return glyph ? glyph : symbol;
+}
+
+CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame, id viewDescriptor) {
     if (!BTCIsReplacementGlyph(image)) return frame;
     BOOL isSymbolImage = [image _isSymbolImage];
     BOOL isToolbar = ([[[view window] className] isEqualToString:@"NSToolbarFullScreenWindow"] || [view isDescendantOf:[[view window] _toolbarView]]);
@@ -104,7 +112,6 @@ CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame) {
     }
     
     NSView* superview = view.superview;
-    CGRect buttonBox = superview.bounds;
     
     BOOL isPrefsWnd = NO;
     for (NSView* potentialWidget in superview.superview.subviews) {
@@ -116,7 +123,19 @@ CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame) {
     double widthForCalc = isPrefsWnd ? 32 : image.size.width;
     double heightForCalc = isPrefsWnd ? widthForCalc : image.size.height;
     
-    CGPoint center = CGPointMake((buttonBox.size.width / 2) - (widthForCalc / 2), floor((buttonBox.size.height / 2) - (heightForCalc / 2)));
+    // More accurate centering algorithm
+    CGPoint center = CGPointMake(frame.origin.x - 0.5 * (widthForCalc - frame.size.width), 0.5 * ([superview frame].size.height - heightForCalc));
+    
+    // Account for offset that earlier OS versions had
+    if ([superview respondsToSelector:@selector(bezelStyle)]) {
+        if ([(NSButton*)superview bezelStyle] == NSBezelStyleToolbar) {
+            center.y -= 0.5;
+        }
+    } else if ([superview respondsToSelector:@selector(controlSize)]) {
+        if ([(NSSegmentedControl*)superview controlSize] == NSControlSizeRegular) {
+            center.y -= 0.5;
+        }
+    }
     
     if (([superview.className containsString:@"PopUp"] || [superview.className containsString:@"PullDown"]) && [superview respondsToSelector:@selector(arrowPosition)]) {
         // calling valueForKey does not work here so we have to cast to the relevant class to check arrowPosition attribute
@@ -137,8 +156,7 @@ hook(NSSegmentItemImageView)
 }
 
 - (void)setFrame:(CGRect)frame {
-    frame = CalculateToolbarImageFrame((NSView*)self, [self image], frame);
-    return ZKOrig(void, frame);
+    return ZKOrig(void, CalculateToolbarImageFrame((NSView*)self, [self image], frame, (id)self));
 }
 
 - (int)_vibrancyBlendMode {
@@ -155,12 +173,34 @@ hook(NSButtonImageView)
 }
 
 - (void)setFrame:(CGRect)frame {
-    return ZKOrig(void, CalculateToolbarImageFrame((NSView*)self, [self image], frame));
+    return ZKOrig(void, CalculateToolbarImageFrame((NSView*)self, [self image], frame, (id)self));
 }
 
 - (int)_vibrancyBlendMode {
     // Fix prefs window tab icon colorization
     return 0;
+}
+
+endhook
+
+// For when we know that we're in a toolbar without any ambiguity and we don't have or need extra data
+NSImage* SimpleFindToolbarImage(NSImage* symbol) {
+    NSImage* glyph = FindLegacyToolbarGlyph(GetSymbolName(symbol), NO);
+    return glyph ? glyph : symbol;
+}
+
+hook(ToolbarButtonPlus)
+
+- (void)setImage:(NSImage*)image {
+    return ZKOrig(void, SimpleFindToolbarImage(image));
+}
+
+endhook
+
+hook(TToolbarItemDropTargetView)
+
+- (void)setImage:(NSImage*)image {
+    return ZKOrig(void, SimpleFindToolbarImage(image));
 }
 
 endhook
