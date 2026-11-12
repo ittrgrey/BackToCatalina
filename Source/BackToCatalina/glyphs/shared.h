@@ -47,6 +47,12 @@ static inline NSString* GetSymbolName(NSImage* symbol) {
     return nil;
 }
 
+NSImage* FindLegacyToolbarGlyph(NSString* symbolName, BOOL isPrefsWnd);
+NSImage* GetToolbarButtonImage(NSView* view, NSImage* symbol);
+NSImage* SimpleFindToolbarImage(NSImage* symbol);
+
+CGRect CalculateToolbarImageFrame(NSView* view, NSImage* image, CGRect frame, id viewDescriptor);
+
 static const NSDictionary* toolbarGlyphMap = @{
     @"chevron.backward": @"Backarrow.pdf",
     @"chevron.left": @"Backarrow.pdf", // Different glyphs are used... when it's not a toolbar
