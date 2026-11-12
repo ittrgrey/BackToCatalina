@@ -48,26 +48,30 @@ __attribute__((constructor)) static void BTCInstallAppHooks(void) {
 }
 
 CTFontRef (*_FontCreateWithFontDescriptorOld)(CTFontDescriptorRef _Nonnull descriptor, CGFloat size, const CGAffineTransform * _Nullable matrix);
+// Helvetica Neue restoration
 CTFontRef FontCreateWithFontDescriptorNew(CTFontDescriptorRef _Nonnull descriptor, CGFloat size, const CGAffineTransform * _Nullable matrix) {
-    // Read descriptor
+    CTFontRef orig = _FontCreateWithFontDescriptorOld(descriptor, size, matrix);
     CFDictionaryRef dictionary = CTFontDescriptorCopyAttributes(descriptor);
     NSString *fontName = CFDictionaryGetValue(dictionary, (__bridge CFStringRef)NSFontNameAttribute);
+    NSString *fontTraits = CFDictionaryGetValue(dictionary, (__bridge CFStringRef)NSFontTraitsAttribute);
     NSString *uiAttr = CFDictionaryGetValue(dictionary, @"NSCTFontUIUsageAttribute");
-    if (uiAttr || (!fontName && !([[[NSBundle mainBundle] bundleIdentifier] containsString:@"Pages"] || [[[NSBundle mainBundle] bundleIdentifier] containsString:@"Keynote"] || [[[NSBundle mainBundle] bundleIdentifier] containsString:@"Numbers"])) || ([fontName containsString:@"AppleSystemUIFont"] &&
-         !([[[NSBundle mainBundle] bundleIdentifier] containsString:@"Passwords"]
-            || [[[NSBundle mainBundle] bundleIdentifier] containsString:@"Safari"] ))) {
-            // Update descriptor
-            NSMutableDictionary *mutableDictionary = [(__bridge NSDictionary *)dictionary mutableCopy];
-            [mutableDictionary removeObjectForKey:@"NSCTFontTraitsAttribute"];
-            [mutableDictionary removeObjectForKey:@"NSCTFontUIUsageAttribute"];
+    if (uiAttr || (!fontName && fontTraits) || ([fontName containsString:@"AppleSystemUIFont"] &&
+         !([NSBundle.mainBundle.bundleIdentifier containsString:@"Passwords"]
+            || [NSBundle.mainBundle.bundleIdentifier containsString:@"Safari"] ))) {
+        NSMutableDictionary *mutableDictionary = [(__bridge NSDictionary *)dictionary mutableCopy];
+        [mutableDictionary removeObjectForKey:@"NSCTFontTraitsAttribute"];
+        [mutableDictionary removeObjectForKey:@"NSCTFontUIUsageAttribute"];
         
-            // Unlike with Lucida, it's a font collection so we don't need to specify variants
-            // Setting this value reverts SF Pro usage to Helvetica Neue
-            [mutableDictionary setValue:(@"AppleSystemUIFont") forKey:NSFontNameAttribute];
-            descriptor = CTFontDescriptorCreateWithAttributes((__bridge CFDictionaryRef)mutableDictionary);
+        // Setting this value reverts SF Pro usage to Helvetica Neue
+        [mutableDictionary setValue: @"AppleSystemUIFont" forKey:NSFontNameAttribute];
+        CTFontDescriptorRef newDescriptor = CTFontDescriptorCreateWithAttributes((__bridge CFDictionaryRef)mutableDictionary);
+        if (newDescriptor) {
+            CTFontRef newFont = _FontCreateWithFontDescriptorOld(newDescriptor, size, matrix);
+            return newFont ? newFont : orig;
+        }
     }
     
-    return _FontCreateWithFontDescriptorOld(descriptor, size, matrix);
+    return orig;
 }
 
 Boolean CommonAppKitTrue(void) {
