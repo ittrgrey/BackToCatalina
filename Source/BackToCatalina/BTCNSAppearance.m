@@ -252,9 +252,11 @@ hook(NSAppearance)
 
 // Disabling this value reverts older-style controls (i.e. NSButton) that existed before macOS 11 to the colouring used in versions 10.10 to 10.13
 // Documented here incase it is needed by anyone in the future
-//- (BOOL)_allowsSystemControlTintColors {
-//    return YES;
-//}
+#ifdef APPLY_SYRAH
+- (BOOL)_allowsSystemControlTintColors {
+    return NO;
+}
+#endif
 
 endhook
 #endif
