@@ -47,6 +47,29 @@ __attribute__((constructor)) static void BTCInstallAppHooks(void) {
     if (isWeather && isGoldenGateOrLater) ZKSwizzleGroup(BTCWeather);
 }
 
+CTFontRef (*_FontCreateWithFontDescriptorOld)(CTFontDescriptorRef _Nonnull descriptor, CGFloat size, const CGAffineTransform * _Nullable matrix);
+CTFontRef FontCreateWithFontDescriptorNew(CTFontDescriptorRef _Nonnull descriptor, CGFloat size, const CGAffineTransform * _Nullable matrix) {
+    // Read descriptor
+    CFDictionaryRef dictionary = CTFontDescriptorCopyAttributes(descriptor);
+    NSString *fontName = CFDictionaryGetValue(dictionary, (__bridge CFStringRef)NSFontNameAttribute);
+    NSString *uiAttr = CFDictionaryGetValue(dictionary, @"NSCTFontUIUsageAttribute");
+    if (uiAttr || (!fontName && !([[[NSBundle mainBundle] bundleIdentifier] containsString:@"Pages"] || [[[NSBundle mainBundle] bundleIdentifier] containsString:@"Keynote"] || [[[NSBundle mainBundle] bundleIdentifier] containsString:@"Numbers"])) || ([fontName containsString:@"AppleSystemUIFont"] &&
+         !([[[NSBundle mainBundle] bundleIdentifier] containsString:@"Passwords"]
+            || [[[NSBundle mainBundle] bundleIdentifier] containsString:@"Safari"] ))) {
+            // Update descriptor
+            NSMutableDictionary *mutableDictionary = [(__bridge NSDictionary *)dictionary mutableCopy];
+            [mutableDictionary removeObjectForKey:@"NSCTFontTraitsAttribute"];
+            [mutableDictionary removeObjectForKey:@"NSCTFontUIUsageAttribute"];
+        
+            // Unlike with Lucida, it's a font collection so we don't need to specify variants
+            // Setting this value reverts SF Pro usage to Helvetica Neue
+            [mutableDictionary setValue:(@"AppleSystemUIFont") forKey:NSFontNameAttribute];
+            descriptor = CTFontDescriptorCreateWithAttributes((__bridge CFDictionaryRef)mutableDictionary);
+    }
+    
+    return _FontCreateWithFontDescriptorOld(descriptor, size, matrix);
+}
+
 Boolean CommonAppKitTrue(void) {
     return YES;
 }
@@ -94,7 +117,12 @@ WEAK_IMPORT_ATTRIBUTE
             isSafari27OrLater = YES;
         }
     }
+#ifdef APPLY_SYRAH
     
+    DobbyHook(DobbySymbolResolver(NULL, "CTFontCreateWithFontDescriptor"), FontCreateWithFontDescriptorNew, (void**)&_FontCreateWithFontDescriptorOld);
+    
+    
+#endif
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
               CommonAppKitTrue,
               &CommonOld);
