@@ -81,11 +81,10 @@ CGRect CalculateSidebarImageFrame(NSView* view, NSImage* image, CGRect frame) {
     }
     
     NSView* superview = view.superview;
-    CGRect buttonBox = superview.bounds;
     
     int desiredSquare = 18;
     
-    CGPoint center = CGPointMake((buttonBox.size.width / 2) - (desiredSquare / 2), (buttonBox.size.height / 2) - (desiredSquare / 2));
+    CGPoint center = CGPointMake(frame.origin.x - 0.5 * (desiredSquare - frame.size.width), 0.5 * ([superview frame].size.height - desiredSquare));
     
     // Return the new centered square box
     return CGRectMake(center.x, center.y, desiredSquare, desiredSquare);
