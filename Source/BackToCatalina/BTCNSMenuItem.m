@@ -51,19 +51,28 @@ static BOOL BTCMenuIsFinderGoMenu(NSMenu *menu) {
     return NO;
 }
 
+@interface NSMenuItem (Cabernet)
+- (BOOL)_isAppleMenuItem;
+@end
+
 hook(NSMenuItem)
 
 - (NSInteger)indentationLevel {
     return MAX(1, ZKOrig(NSInteger));
 }
 
-- (NSImage *)image {
-    NSImage *orig = ZKOrig(NSImage *);
+- (NSImage*)image {
+#ifdef APPLY_SYRAH
+    if ([(NSMenuItem*)self _isAppleMenuItem]) {
+        return [carBundle imageForResource:@"Apple"];
+    }
+#endif
+    NSImage* orig = ZKOrig(NSImage*);
     if (!isTahoeOrLater) {
         return orig;
     }
     
-    NSMenuItem *item = (NSMenuItem *)self;
+    NSMenuItem* item = (NSMenuItem*)self;
     if (!orig.isTemplate || item.title.length < 1) {
         return orig;
     }
@@ -75,12 +84,12 @@ hook(NSMenuItem)
     });
 
     if (isFinder && BTCMenuIsFinderGoMenu(item.menu)) {
-        NSString *identifier = GetSymbolName(orig);
-        NSImage *legacyGlyph = identifier ? FindLegacySidebarGlyph(identifier) : nil;
+        NSString* identifier = GetSymbolName(orig);
+        NSImage* legacyGlyph = identifier ? FindLegacySidebarGlyph(identifier) : nil;
         if (!legacyGlyph) {
             return orig;
         }
-        NSImage *sizedGlyph = [legacyGlyph copy];
+        NSImage* sizedGlyph = [legacyGlyph copy];
         sizedGlyph.size = CGSizeMake(18, 18);
         return sizedGlyph;
     }
