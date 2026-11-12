@@ -181,7 +181,11 @@ static const NSDictionary* applicationPrefsGlyphMap = @{
 static const NSDictionary* finderSidebarGlyphMap = @{
     // Finder
     @"clock": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarRecents.icns",
+#ifdef APPLY_SYRAH
+    @"appstore": @"SidebarApplicationsFolder.icns",
+#else
     @"appstore": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarApplicationsFolder.icns",
+#endif
     @"menubar.dock.rectangle": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDesktopFolder.icns",
     @"doc": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns",
     @"document": @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/SidebarDocumentsFolder.icns",
