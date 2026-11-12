@@ -12,3 +12,6 @@
 
 // Uncomment this to temporarily disable loading any changes for debugging purposes...
 //#define DEBUG_DISABLE
+
+// Uncomment to use 10.10 Yosemite characteristics, largely within Catalina's design
+#define APPLY_SYRAH
