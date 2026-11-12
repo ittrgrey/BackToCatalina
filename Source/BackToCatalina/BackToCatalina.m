@@ -14,8 +14,7 @@ BOOL isWeather;
 BOOL isFinder;
 BOOL isShortcuts;
 
-Boolean (*CompatWidgetOld)(void);
-Boolean (*SelectionRolloverOld)(void);
+Boolean (*CommonOld)(void);
 
 void BTCInstallToolbarAnimationHooks(void);
 void BTCInstallSidebarFontHook(void);
@@ -75,8 +74,8 @@ WEAK_IMPORT_ATTRIBUTE
 
 +(void)load {
     // This loads from a bundle that contains the asset files, but otherwise has been renamed etc so that it isn't wiped during system updates
-    carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/libBackToCatalina/BTC_VisualStyle.bundle"];
-    //carBundle = [NSBundle bundleWithPath:@"/private/var/ammonia/core/tweaks/MacOSXArt.bundle"];
+    NSString* carPath = @"/private/var/ammonia/core/tweaks/libBackToCatalina/BTC_VisualStyle.bundle";
+    carBundle = [NSBundle bundleWithPath:carPath];
     
     // Check if we are on Tahoe or later
     isTahoeOrLater = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:tahoeVersion];
@@ -98,12 +97,11 @@ WEAK_IMPORT_ATTRIBUTE
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerCompatabilitySelectionWidgetDefaultValueFunction"),
               CommonAppKitTrue,
-              &CompatWidgetOld);
+              &CommonOld);
     
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerSupportsSelectionRolloverDefaultValueFunction"),
               CommonAppKitFalse,
-              &SelectionRolloverOld);
-    
+              &CommonOld);
     
 }
 
