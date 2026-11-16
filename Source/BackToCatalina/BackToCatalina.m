@@ -63,7 +63,7 @@ CTFontRef FontCreateWithFontDescriptorNew(CTFontDescriptorRef _Nonnull descripto
         [mutableDictionary removeObjectForKey:@"NSCTFontUIUsageAttribute"];
         
         // Setting this value reverts SF Pro usage to Helvetica Neue
-        [mutableDictionary setValue: @"AppleSystemUIFont" forKey:NSFontNameAttribute];
+        [mutableDictionary setValue:([fontName containsString:@"Bold"]) ? @"HelveticaNeue-Bold" : @"AppleSystemUIFont" forKey:NSFontNameAttribute];
         CTFontDescriptorRef newDescriptor = CTFontDescriptorCreateWithAttributes((__bridge CFDictionaryRef)mutableDictionary);
         if (newDescriptor) {
             CTFontRef newFont = _FontCreateWithFontDescriptorOld(newDescriptor, size, matrix);
@@ -122,8 +122,10 @@ WEAK_IMPORT_ATTRIBUTE
         }
     }
 #ifdef APPLY_SYRAH
-    
     DobbyHook(DobbySymbolResolver(NULL, "CTFontCreateWithFontDescriptor"), FontCreateWithFontDescriptorNew, (void**)&_FontCreateWithFontDescriptorOld);
+
+    CFErrorRef error;
+    CTFontManagerRegisterFontsForURL(CFURLCreateWithString(NULL, CFSTR("/private/var/ammonia/core/tweaks/libBackToCatalina/BTC_VisualStyle.bundle/Contents/Resources/HelveticaNeue-Bold.ttf"), NULL), kCTFontManagerScopeProcess, &error);
     
     
 #endif
@@ -134,7 +136,6 @@ WEAK_IMPORT_ATTRIBUTE
     DobbyHook(DobbySymbolResolver("AppKit", "_NSToolbarItemViewerSupportsSelectionRolloverDefaultValueFunction"),
               CommonAppKitFalse,
               &CommonOld);
-    
 }
 
 @end
