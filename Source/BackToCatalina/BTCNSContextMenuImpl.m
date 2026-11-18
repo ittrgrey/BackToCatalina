@@ -38,7 +38,7 @@ hook(NSContextMenuImpl)
     return (orig > 19) && (orig < 27) ? 19 + (orig - 19) / 1000 : orig;
 }
 
-- (double)_targetHeight:(bool)unk {
+- (double)_targetHeight:(BOOL)unk {
     double orig = ZKOrig(double, unk);
     
     NSInteger itemTotal = [[(NSContextMenuImpl*)self menu] numberOfItems];

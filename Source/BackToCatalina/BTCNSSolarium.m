@@ -17,13 +17,13 @@ static long SolariumEnablementNew(long idiom) {
     return BTCSolariumCompatibility;
 }
 
-static bool (*SolariumIsEnabledOrig)(long idiom);
-static bool SolariumIsEnabledNew(long idiom) {
+static BOOL (*SolariumIsEnabledOrig)(long idiom);
+static BOOL SolariumIsEnabledNew(long idiom) {
     return false;
 }
 
-static bool (*SolariumIsEnabledForOrig)(long idiom);
-static bool SolariumIsEnabledForNew(long idiom) {
+static BOOL (*SolariumIsEnabledForOrig)(long idiom);
+static BOOL SolariumIsEnabledForNew(long idiom) {
     return false;
 }
 
